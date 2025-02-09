@@ -2,6 +2,7 @@ const BlockType = require('../extension-support/block-type');
 const ArgumentType = require('../extension-support/argument-type');
 const web3 = require('@solana/web3.js');
 const bs58 = require('bs58');
+let net = web3.clusterApiUrl('mainnet-beta');
 // const {Buffer} = require('buffer');
 const token = require('@solana/spl-token');
 // const JUP_API = 'https://quote-api.jup.ag/v6';
@@ -46,13 +47,29 @@ class Solana {
                 },
 
                 {
-                    opcode: 'getNet',
-                    blockType: BlockType.REPORTER,
-                    text: '[SOLANA] RPC Url of [net]',
+                    opcode: 'setNet',
+                    blockType: BlockType.COMMAND,
+                    text: '[SOLANA] Set RPC Url to [net]',
                     arguments: {
                         net: {
                             type: ArgumentType.STRING,
                             menu: 'networks'
+                        },
+                        SOLANA: {
+                            type: ArgumentType.IMAGE,
+                            dataURI: blockIconURI
+                        }
+                    }
+                },
+
+                {
+                    opcode: 'setCustomNet',
+                    blockType: BlockType.COMMAND,
+                    text: '[SOLANA] Set RPC Url to [net]',
+                    arguments: {
+                        net: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'https://api.devnet.solana.com'
                         },
                         SOLANA: {
                             type: ArgumentType.IMAGE,
@@ -96,7 +113,7 @@ class Solana {
                 {
                     opcode: 'checkBalance',
                     blockType: BlockType.REPORTER,
-                    text: '[SOLANA] Check Balance of [address] on [net]',
+                    text: '[SOLANA] Check Balance of [address]',
                     arguments: {
                         address: {
                             type: ArgumentType.STRING,
@@ -105,10 +122,6 @@ class Solana {
                         SOLANA: {
                             type: ArgumentType.IMAGE,
                             dataURI: blockIconURI
-                        },
-                        net: {
-                            type: ArgumentType.STRING,
-                            defaultValue: 'RPC Url'
                         }
                     }
                 },
@@ -116,7 +129,7 @@ class Solana {
                 {
                     opcode: 'receiveSol',
                     blockType: BlockType.REPORTER,
-                    text: '[SOLANA] Receive [amount] Sol from User to [address] on [net]',
+                    text: '[SOLANA] Receive [amount] Sol from User to [address]',
                     arguments: {
                         address: {
                             type: ArgumentType.STRING,
@@ -129,10 +142,6 @@ class Solana {
                         SOLANA: {
                             type: ArgumentType.IMAGE,
                             dataURI: blockIconURI
-                        },
-                        net: {
-                            type: ArgumentType.STRING,
-                            defaultValue: 'RPC Url'
                         }
                     }
                 },
@@ -140,7 +149,7 @@ class Solana {
                 {
                     opcode: 'sendSol',
                     blockType: BlockType.REPORTER,
-                    text: '[SOLANA] Send [amount] Sol from [private] to [address] on [net]',
+                    text: '[SOLANA] Send [amount] Sol from [private] to [address]',
                     arguments: {
                         private: {
                             type: ArgumentType.STRING,
@@ -157,10 +166,6 @@ class Solana {
                         SOLANA: {
                             type: ArgumentType.IMAGE,
                             dataURI: blockIconURI
-                        },
-                        net: {
-                            type: ArgumentType.STRING,
-                            defaultValue: 'RPC Url'
                         }
                     }
                 },
@@ -168,7 +173,7 @@ class Solana {
                 {
                     opcode: 'sendToken',
                     blockType: BlockType.REPORTER,
-                    text: '[SOLANA] Send [amount] of mint [ca] from [private] to [address] on [net]',
+                    text: '[SOLANA] Send [amount] of mint [ca] from [private] to [address]',
                     arguments: {
                         ca: {
                             type: ArgumentType.STRING,
@@ -189,10 +194,6 @@ class Solana {
                         SOLANA: {
                             type: ArgumentType.IMAGE,
                             dataURI: blockIconURI
-                        },
-                        net: {
-                            type: ArgumentType.STRING,
-                            defaultValue: 'RPC Url'
                         }
                     }
                 },
@@ -200,7 +201,7 @@ class Solana {
                 {
                     opcode: 'deployToken',
                     blockType: BlockType.REPORTER,
-                    text: '[SOLANA] Deploy token by [privateKey] with Decimals:[decimals] on [net]',
+                    text: '[SOLANA] Deploy token by [privateKey] with Decimals:[decimals]',
                     arguments: {
                         privateKey: {
                             type: ArgumentType.STRING,
@@ -213,10 +214,6 @@ class Solana {
                         SOLANA: {
                             type: ArgumentType.IMAGE,
                             dataURI: blockIconURI
-                        },
-                        net: {
-                            type: ArgumentType.STRING,
-                            defaultValue: 'RPC Url'
                         }
                     }
                 },
@@ -309,16 +306,23 @@ class Solana {
         }
     }
 
-    getNet (args) {
-        const net = args.net;
-        switch (net) {
+    setNet (args) {
+        const setNet = args.net;
+        switch (setNet) {
         case 'mainnet-beta':
-            return web3.clusterApiUrl('mainnet-beta');
+            net = web3.clusterApiUrl('mainnet-beta');
+            break;
         case 'devnet':
-            return web3.clusterApiUrl('devnet');
+            net = web3.clusterApiUrl('devnet');
+            break;
         case 'testnet':
-            return web3.clusterApiUrl('testnet');
+            net = web3.clusterApiUrl('testnet');
+            break;
         }
+    }
+
+    setCustomNet (args) {
+        net = args.net;
     }
 
     async log (args) {
@@ -333,7 +337,7 @@ class Solana {
     async checkBalance (args) {
         const address = args.address;
         const to = new web3.PublicKey(address);
-        const connection = new web3.Connection(args.net);
+        const connection = new web3.Connection(net);
         try {
             const balance = await connection.getBalance(to);
             return balance / web3.LAMPORTS_PER_SOL;
@@ -346,7 +350,7 @@ class Solana {
         const address = args.address;
         const amount = args.amount;
         const to = new web3.PublicKey(address);
-        const connection = new web3.Connection(args.net);
+        const connection = new web3.Connection(net);
         if (window.solana) {
             if (!window.solana.isConnected) {
                 await window.solana.connect();
@@ -379,7 +383,7 @@ class Solana {
         const fromSecretKey = bs58.default.decode(from);
         const fromKeypair = web3.Keypair.fromSecretKey(fromSecretKey);
         const to = new web3.PublicKey(address);
-        const connection = new web3.Connection(args.net);
+        const connection = new web3.Connection(net);
         await connection.getLatestBlockhash();
         const transaction = new web3.Transaction().add(
             web3.SystemProgram.transfer({
@@ -399,7 +403,7 @@ class Solana {
         const amount = args.amount;
         const from = args.private;
         const mint = new web3.PublicKey(args.ca);
-        const connection = new web3.Connection(args.net);
+        const connection = new web3.Connection(net);
         const fromSecretKey = bs58.default.decode(from);
         const fromKeypair = web3.Keypair.fromSecretKey(fromSecretKey);
         const to = new web3.PublicKey(address);
@@ -437,7 +441,7 @@ class Solana {
     async deployToken (args) {
         const privateKey = args.privateKey;
         const decimals = args.decimals;
-        const connection = new web3.Connection(args.net);
+        const connection = new web3.Connection(net);
         const fromSecretKey = bs58.default.decode(privateKey);
         const fromKeypair = web3.Keypair.fromSecretKey(fromSecretKey);
         const mint = await token.createMint(
