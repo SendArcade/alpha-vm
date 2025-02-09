@@ -6,8 +6,6 @@ const BlockType = require('../../src/extension-support/block-type');
 const dispatch = require('../../src/dispatch/central-dispatch');
 const VirtualMachine = require('../../src/virtual-machine');
 
-const Sprite = require('../../src/sprites/sprite');
-const RenderedTarget = require('../../src/sprites/rendered-target');
 
 // By default Central Dispatch works with the Worker class built into the browser. Tell it to use TinyWorker instead.
 dispatch.workerClass = Worker;
