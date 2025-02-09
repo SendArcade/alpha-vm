@@ -95,8 +95,8 @@ test('internal extension', t => {
 
 test('load sync', t => {
     const vm = new VirtualMachine();
-    vm.extensionManager.loadExtensionIdSync('coreExample');
-    t.ok(vm.extensionManager.isExtensionLoaded('coreExample'));
+    vm.extensionManager.loadExtensionIdSync('solana');
+    t.ok(vm.extensionManager.isExtensionLoaded('solana'));
 
     t.equal(vm.runtime._blockInfo.length, 1);
 
