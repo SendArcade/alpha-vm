@@ -21,7 +21,7 @@ const base = {
         // Added '.cjs' to ensure these files are resolved
         extensions: ['.js', '.mjs', '.cjs'],
         alias: {
-            'buffer': require.resolve('buffer/'),
+            'buffer': require.resolve('buffer'),
             'events': require.resolve('events/'),
             'node:url': require.resolve('url')
         }
