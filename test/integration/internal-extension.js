@@ -97,3 +97,10 @@ test('load sync', t => {
     t.ok(vm.extensionManager.isExtensionLoaded('solana'));
     t.end();
 });
+
+test('load sync', t => {
+    const vm = new VirtualMachine();
+    vm.extensionManager.loadExtensionIdSync('jupiter');
+    t.ok(vm.extensionManager.isExtensionLoaded('jupiter'));
+    t.end();
+});
