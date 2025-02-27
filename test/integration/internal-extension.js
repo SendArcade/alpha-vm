@@ -104,3 +104,10 @@ test('load sync', t => {
     t.ok(vm.extensionManager.isExtensionLoaded('jupiter'));
     t.end();
 });
+
+test('load sync', t => {
+    const vm = new VirtualMachine();
+    vm.extensionManager.loadExtensionIdSync('send');
+    t.ok(vm.extensionManager.isExtensionLoaded('send'));
+    t.end();
+});
