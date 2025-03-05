@@ -111,3 +111,17 @@ test('load sync', t => {
     t.ok(vm.extensionManager.isExtensionLoaded('send'));
     t.end();
 });
+
+test('load sync', t => {
+    const vm = new VirtualMachine();
+    vm.extensionManager.loadExtensionIdSync('pumpFun');
+    t.ok(vm.extensionManager.isExtensionLoaded('pumpFun'));
+    t.end();
+});
+
+test('load sync', t => {
+    const vm = new VirtualMachine();
+    vm.extensionManager.loadExtensionIdSync('metaplex');
+    t.ok(vm.extensionManager.isExtensionLoaded('metaplex'));
+    t.end();
+});
