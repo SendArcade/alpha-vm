@@ -46,7 +46,7 @@ class Metaplex {
                 {
                     opcode: 'deployToken',
                     blockType: BlockType.REPORTER,
-                    text: '[METAPLEX] Deploy token with [name], [uri], [symbol], [decimals] and Initial supply [supply] by [privateKey]',
+                    text: '[METAPLEX] Deploy token with [name], [uri], [symbol], Decimals [decimals] and Initial supply [supply] by [privateKey]',
                     arguments: {
                         name: {
                             type: ArgumentType.STRING,
