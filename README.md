@@ -187,6 +187,26 @@ class Protocol {
 module.exports = Protocol;
 
 ```
+
+Now in the alpha-gui repo edit the default project to add your protocol there so that it loads by default.
+Go to the file:
+```bash
+  src/lib/default-project/project-data.js
+```
+And add the below snippet to your need in the blocks:
+```js
+protocol: {
+          opcode: 'protocol_enableProtocol',
+          next: null,
+          parent: null,
+          inputs: {},
+          fields: {},
+          shadow: true,
+          topLevel: true,
+          x: 0,
+          y: 0
+        },
+```
 More on how to make these in the contribution guide.
 
 ## Roadmap
