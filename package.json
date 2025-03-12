@@ -4,10 +4,10 @@
   "description": "Virtual Machine for Send Arcade Alpha",
   "author": "Arpit Singh Bhatia",
   "license": "MPL-2.0",
-  "homepage": "",
+  "homepage": "https://github.com/SendArcade/alpha-vm",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/SendArcade/alpha-vm"
   },
   "main": "./src/index.js",
   "browser": "./src/index.js",
