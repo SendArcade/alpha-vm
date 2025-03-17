@@ -42,6 +42,21 @@ const base = {
                 include: /node_modules\/@solana/,
                 type: 'javascript/auto'
             },
+            // Add specific rule for ESM modules in wallet adapter
+            {
+                test: /\.js$/,
+                include: /node_modules\/@solana\/wallet-adapter/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ['@babel/preset-env'],
+                        plugins: [
+                            '@babel/plugin-proposal-optional-chaining',
+                            '@babel/plugin-proposal-nullish-coalescing-operator'
+                        ]
+                    }
+                }
+            },
             // Transpile our source files and selected node_modules (including .js, .mjs, and .cjs files)
             {
                 // This rule matches .js, .mjs, and .cjs files.
