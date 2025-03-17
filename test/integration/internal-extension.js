@@ -125,3 +125,10 @@ test('load sync', t => {
     t.ok(vm.extensionManager.isExtensionLoaded('metaplex'));
     t.end();
 });
+
+test('load sync', t => {
+    const vm = new VirtualMachine();
+    vm.extensionManager.loadExtensionIdSync('helius');
+    t.ok(vm.extensionManager.isExtensionLoaded('helius'));
+    t.end();
+});
