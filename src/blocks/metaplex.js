@@ -5,6 +5,7 @@ const ArgumentType = require('../extension-support/argument-type');
 const bs58 = require('bs58');
 // const token = require('@solana/spl-token');
 const web3 = require('@solana/web3.js');
+const Solana = require('./solana');
 const {createUmi} = require('@metaplex-foundation/umi-bundle-defaults');
 const {generateSigner, keypairIdentity} = require('@metaplex-foundation/umi');
 const {
@@ -91,7 +92,7 @@ class Metaplex {
 
     async deployToken (args) {
         const {name, uri, symbol, decimals, supply, privateKey} = args;
-        const connection = new web3.Connection('https://api.mainnet-beta.solana.com');
+        const connection = new web3.Connection(Solana.net);
         const fromSecretKey = bs58.default.decode(privateKey);
         const fromKeypair = web3.Keypair.fromSecretKey(fromSecretKey);
         try {
