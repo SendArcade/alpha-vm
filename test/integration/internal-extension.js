@@ -132,3 +132,10 @@ test('load sync', t => {
     t.ok(vm.extensionManager.isExtensionLoaded('helius'));
     t.end();
 });
+
+test('load sync', t => {
+    const vm = new VirtualMachine();
+    vm.extensionManager.loadExtensionIdSync('coingecko');
+    t.ok(vm.extensionManager.isExtensionLoaded('coingecko'));
+    t.end();
+});

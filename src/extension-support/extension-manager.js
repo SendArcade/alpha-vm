@@ -16,6 +16,7 @@ const defaultBuiltinExtensions = {
     pumpFun: () => require('../blocks/pumpFun'),
     metaplex: () => require('../blocks/metaplex'),
     helius: () => require('../blocks/helius'),
+    coingecko: () => require('../blocks/coingecko'),
     // These are the non-core built-in extensions.
     pen: () => require('../extensions/scratch3_pen'),
     wedo2: () => require('../extensions/scratch3_wedo2'),
