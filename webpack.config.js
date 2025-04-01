@@ -24,8 +24,6 @@ const base = {
             'buffer': require.resolve('buffer'),
             'events': require.resolve('events/'),
             'node:url': require.resolve('url'),
-            // Added alias to resolve the old import path without changing anything else
-            '@metaplex-foundation/umi/serializers': require.resolve('@metaplex-foundation/umi-serializers')
         }
     },
     module: {
@@ -66,17 +64,9 @@ const base = {
                 //     @solana/spl-token, @solana/spl-token-metadata, @solana/errors, @solana/options,
                 //     @solana/codecs-numbers, @solana/spl-token-group, @solana/codecs-strings, @solana/codecs-core,
                 //     @solana/wallet-adapter-base, @solana/wallet-adapter-phantom, @solana/wallet-adapter-wallets,
-                //     **@metaplex-foundation/umi**, **@metaplex-foundation/mpl-toolbox**,
-                //     **@metaplex-foundation/umi-serializers-numbers**, **@metaplex-foundation/umi-public-keys**,
-                //     **@metaplex-foundation/umi-serializers**, **@metaplex-foundation/umi-serializers-core**,
-                //     **@metaplex-foundation/umi-serializers-encodings**, **@metaplex-foundation/mpl-token-metadata**,
-                //     **@metaplex-foundation/umi-web3js-adapters**, **@metaplex-foundation/umi-bundle-defaults**,
-                //     **@metaplex-foundation/umi-eddsa-web3js**, **@metaplex-foundation/umi-program-repository**,
-                //     **@metaplex-foundation/umi-transaction-factory-web3js**, **@metaplex-foundation/umi-http-fetch**,
-                //     and **@metaplex-foundation/umi-rpc-web3js**
                 // It also whitelists @noble/curves, superstruct, and rpc-websockets.
                 test: /\.(mjs|cjs|js)$/,
-                exclude: /node_modules\/(?!((@metaplex-foundation\/(umi|mpl-toolbox|umi-serializers-numbers|umi-public-keys|umi-serializers|umi-serializers-core|umi-serializers-encodings|mpl-token-metadata|umi-web3js-adapters|umi-bundle-defaults|umi-eddsa-web3js|umi-program-repository|umi-transaction-factory-web3js|umi-http-fetch|umi-rpc-web3js))|(@solana\/(web3\.js|codecs|codecs-data-structures|spl-token|spl-token-metadata|errors|options|codecs-numbers|spl-token-group|codecs-strings|codecs-core|wallet-adapter-base|wallet-adapter-phantom|wallet-adapter-wallets))|(@noble\/curves)|superstruct|rpc-websockets)\/)/,
+                exclude: /node_modules\/(?!((@solana\/(web3\.js|codecs|codecs-data-structures|spl-token|spl-token-metadata|errors|options|codecs-numbers|spl-token-group|codecs-strings|codecs-core|wallet-adapter-base|wallet-adapter-phantom|wallet-adapter-wallets))|(@noble\/curves)|superstruct|rpc-websockets)\/)/,
                 loader: 'babel-loader',
                 options: {
                     sourceType: 'unambiguous',
