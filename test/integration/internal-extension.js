@@ -119,12 +119,12 @@ test('load sync', t => {
     t.end();
 });
 
-test('load sync', t => {
-    const vm = new VirtualMachine();
-    vm.extensionManager.loadExtensionIdSync('metaplex');
-    t.ok(vm.extensionManager.isExtensionLoaded('metaplex'));
-    t.end();
-});
+// test('load sync', t => {
+//     const vm = new VirtualMachine();
+//     vm.extensionManager.loadExtensionIdSync('metaplex');
+//     t.ok(vm.extensionManager.isExtensionLoaded('metaplex'));
+//     t.end();
+// });
 
 test('load sync', t => {
     const vm = new VirtualMachine();

@@ -14,7 +14,7 @@ const defaultBuiltinExtensions = {
     jupiter: () => require('../blocks/jupiter'),
     send: () => require('../blocks/send'),
     pumpFun: () => require('../blocks/pumpFun'),
-    metaplex: () => require('../blocks/metaplex'),
+    // metaplex: () => require('../blocks/metaplex'),
     helius: () => require('../blocks/helius'),
     coingecko: () => require('../blocks/coingecko'),
     // These are the non-core built-in extensions.

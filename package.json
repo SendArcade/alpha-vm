@@ -34,11 +34,6 @@
     "statements": 70
   },
   "dependencies": {
-    "@metaplex-foundation/mpl-token-metadata": "^3.2.1",
-    "@metaplex-foundation/mpl-toolbox": "^0.9.4",
-    "@metaplex-foundation/umi": "^0.9.1",
-    "@metaplex-foundation/umi-bundle-defaults": "^0.9.1",
-    "@metaplex-foundation/umi-web3js-adapters": "^0.9.1",
     "@privy-io/js-sdk-core": "^0.45.1",
     "@solana/spl-token": "^0.4.12",
     "@solana/wallet-adapter-base": "^0.9.23",
