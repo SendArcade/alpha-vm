@@ -12,6 +12,8 @@ const JupIconURI = 'data:image/svg+xml,%3Csvg%20version%3D%221.1%22%20id%3D%22ka
 // eslint-disable-next-line max-len
 const MenuiconURI = `data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDI0LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPgo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9ImthdG1hbl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCIKCSB2aWV3Qm94PSIwIDAgODAwIDgwMCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgODAwIDgwMDsiIHhtbDpzcGFjZT0icHJlc2VydmUiPgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoJLnN0MHtmaWxsOiMxNDE3MjY7fQoJLnN0MXtmaWxsOnVybCgjU1ZHSURfMV8pO30KCS5zdDJ7ZmlsbDp1cmwoI1NWR0lEXzJfKTt9Cgkuc3Qze2ZpbGw6dXJsKCNTVkdJRF8zXyk7fQoJLnN0NHtmaWxsOnVybCgjU1ZHSURfNF8pO30KCS5zdDV7ZmlsbDp1cmwoI1NWR0lEXzVfKTt9Cgkuc3Q2e2ZpbGw6dXJsKCNTVkdJRF82Xyk7fQo8L3N0eWxlPgo8Y2lyY2xlIGNsYXNzPSJzdDAiIGN4PSI0MDAiIGN5PSI0MDAiIHI9IjQwMCIvPgo8bGluZWFyR3JhZGllbnQgaWQ9IlNWR0lEXzFfIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjU3NC45MjU3IiB5MT0iNjY1Ljg3MjciIHgyPSIyNDguNTI1NyIgeTI9IjE0Mi4zMTI3IiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIC0xIDAgODAwKSI+Cgk8c3RvcCAgb2Zmc2V0PSIwLjE2IiBzdHlsZT0ic3RvcC1jb2xvcjojQzZGNDYyIi8+Cgk8c3RvcCAgb2Zmc2V0PSIwLjg5IiBzdHlsZT0ic3RvcC1jb2xvcjojMzNEOUZGIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxwYXRoIGNsYXNzPSJzdDEiIGQ9Ik01MzYsNTY4LjljLTY2LjgtMTA4LjUtMTY2LjQtMTcwLTI4OS40LTE5NS42Yy00My41LTktODcuMi04LjktMTI5LjQsNy43Yy0yOC45LDExLjQtMzMuMywyMy40LTE5LjcsNTMuNwoJYzkyLjQtMjEuOSwxNzguNC0xLjUsMjU4LjksNDVjODEuMSw0Ni45LDE0MS42LDExMi4yLDE2OS4xLDIwNWMzOC42LTExLjgsNDMuNi0xOC4zLDM0LjMtNTQuMkM1NTQuMyw2MDkuNCw1NDcuNCw1ODcuNCw1MzYsNTY4LjkKCUw1MzYsNTY4Ljl6Ii8+CjxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfMl8iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iNTcyLjU4OTYiIHkxPSI2NjcuMzMwMyIgeDI9IjI0Ni4xOTk2IiB5Mj0iMTQzLjc3MDMiIGdyYWRpZW50VHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgLTEgMCA4MDApIj4KCTxzdG9wICBvZmZzZXQ9IjAuMTYiIHN0eWxlPSJzdG9wLWNvbG9yOiNDNkY0NjIiLz4KCTxzdG9wICBvZmZzZXQ9IjAuODkiIHN0eWxlPSJzdG9wLWNvbG9yOiMzM0Q5RkYiLz4KPC9saW5lYXJHcmFkaWVudD4KPHBhdGggY2xhc3M9InN0MiIgZD0iTTYwOS4xLDQ4MC42Yy04NS44LTEyNS0yMDcuMy0xOTQuOS0zNTUuOC0yMTguM2MtMzkuMy02LjItNzkuNC00LjUtMTE2LjIsMTQuM2MtMTcuNiw5LTMzLjIsMjAuNS0zNy40LDQ0LjkKCWMxMTUuOC0zMS45LDIxOS43LTMuNywzMTcuNSw1M2M5OC4zLDU3LDE3NS4xLDEzMy41LDIwNSwyNTEuMWMyMC44LTE4LjQsMjQuNS00MSwxOS4xLTYyQzYzMy45LDUzNC44LDYyNS41LDUwNC41LDYwOS4xLDQ4MC42CglMNjA5LjEsNDgwLjZ6Ii8+CjxsaW5lYXJHcmFkaWVudCBpZD0iU1ZHSURfM18iIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiB4MT0iNTc3LjAxNDgiIHkxPSI2NjQuNTY3MSIgeDI9IjI1MC42MjQ3IiB5Mj0iMTQxLjAwNzEiIGdyYWRpZW50VHJhbnNmb3JtPSJtYXRyaXgoMSAwIDAgLTEgMCA4MDApIj4KCTxzdG9wICBvZmZzZXQ9IjAuMTYiIHN0eWxlPSJzdG9wLWNvbG9yOiNDNkY0NjIiLz4KCTxzdG9wICBvZmZzZXQ9IjAuODkiIHN0eWxlPSJzdG9wLWNvbG9yOiMzM0Q5RkYiLz4KPC9saW5lYXJHcmFkaWVudD4KPHBhdGggY2xhc3M9InN0MyIgZD0iTTEwNSw0ODguNmM3LjMsMTYuMiwxMi4xLDM0LjUsMjMsNDcuNmM1LjUsNi43LDIyLjIsNC4xLDMzLjgsNS43CgljMTAyLjksMTUuMywxODQuMSw2NS4xLDI0Mi4xLDE1MmMzLjQsNS4xLDguOSwxMi43LDEzLjQsMTIuN2MxNy40LTAuMSwzNC45LTIuOCw1Mi41LTQuNUM0NDksNTU3LjUsMjMyLjgsNDM4LjMsMTA1LDQ4OC42CglMMTA1LDQ4OC42eiIvPgo8bGluZWFyR3JhZGllbnQgaWQ9IlNWR0lEXzRfIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjU2OS4wMjcyIiB5MT0iNjY5LjU1MTgiIHgyPSIyNDIuNjI3MiIgeTI9IjE0NS45OTE3IiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIC0xIDAgODAwKSI+Cgk8c3RvcCAgb2Zmc2V0PSIwLjE2IiBzdHlsZT0ic3RvcC1jb2xvcjojQzZGNDYyIi8+Cgk8c3RvcCAgb2Zmc2V0PSIwLjg5IiBzdHlsZT0ic3RvcC1jb2xvcjojMzNEOUZGIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxwYXRoIGNsYXNzPSJzdDQiIGQ9Ik02NTYuNiwzNjYuN0M1OTkuOSwyODcuNCw1MjEuNywyMzQuNiw0MzIuOSwxOTdjLTYxLjUtMjYuMS0xMjUuMi00MS44LTE5Mi44LTMzLjcKCWMtMjMuNCwyLjgtNDUuMyw5LjUtNjMuNCwyNC43YzIzMC45LDUuOCw0MDQuNiwxMDUuOCw1MjQsMzAzLjNjMC4yLTEzLjEsMi4yLTI3LjctMi42LTM5LjVDNjg2LjEsNDIyLjUsNjc0LjcsMzkyLDY1Ni42LDM2Ni43eiIvPgo8bGluZWFyR3JhZGllbnQgaWQ9IlNWR0lEXzVfIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjU3MS42OTczIiB5MT0iNjY3Ljg5MTciIHgyPSIyNDUuMjk3MyIgeTI9IjE0NC4zMzE3IiBncmFkaWVudFRyYW5zZm9ybT0ibWF0cml4KDEgMCAwIC0xIDAgODAwKSI+Cgk8c3RvcCAgb2Zmc2V0PSIwLjE2IiBzdHlsZT0ic3RvcC1jb2xvcjojQzZGNDYyIi8+Cgk8c3RvcCAgb2Zmc2V0PSIwLjg5IiBzdHlsZT0ic3RvcC1jb2xvcjojMzNEOUZGIi8+CjwvbGluZWFyR3JhZGllbnQ+CjxwYXRoIGNsYXNzPSJzdDUiIGQ9Ik03MDkuOCwzMjUuM2MtNDctMTc4LjktMjM4LTI2NS0zNzkuMi0yMjEuNEM0ODIuNywxMzMuOSw2MDcuNSwyMDYuNCw3MDkuOCwzMjUuM3oiLz4KPGxpbmVhckdyYWRpZW50IGlkPSJTVkdJRF82XyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIHgxPSI1NzkuMDM4MiIgeTE9IjY2My4zMTExIiB4Mj0iMjUyLjY0ODIiIHkyPSIxMzkuNzUxMSIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgxIDAgMCAtMSAwIDgwMCkiPgoJPHN0b3AgIG9mZnNldD0iMC4xNiIgc3R5bGU9InN0b3AtY29sb3I6I0M2RjQ2MiIvPgoJPHN0b3AgIG9mZnNldD0iMC44OSIgc3R5bGU9InN0b3AtY29sb3I6IzMzRDlGRiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8cGF0aCBjbGFzcz0ic3Q2IiBkPSJNMTU1LjQsNTgzLjljNTQuNiw2OS4zLDEyNCwxMDkuNywyMTMsMTIyLjhDMzM0LjQsNjQzLjIsMjE0LjYsNTc0LjUsMTU1LjQsNTgzLjlMMTU1LjQsNTgzLjl6Ii8+Cjwvc3ZnPgo=`;
 const solIconURI = `data:image/svg+xml,%3Csvg width='101' height='88' viewBox='0 0 101 88' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M100.48 69.3817L83.8068 86.8015C83.4444 87.1799 83.0058 87.4816 82.5185 87.6878C82.0312 87.894 81.5055 88.0003 80.9743 88H1.93563C1.55849 88 1.18957 87.8926 0.874202 87.6912C0.558829 87.4897 0.31074 87.2029 0.160416 86.8659C0.0100923 86.529 -0.0359181 86.1566 0.0280382 85.7945C0.0919944 85.4324 0.263131 85.0964 0.520422 84.8278L17.2061 67.408C17.5676 67.0306 18.0047 66.7295 18.4904 66.5234C18.9762 66.3172 19.5002 66.2104 20.0301 66.2095H99.0644C99.4415 66.2095 99.8104 66.3169 100.126 66.5183C100.441 66.7198 100.689 67.0067 100.84 67.3436C100.99 67.6806 101.036 68.0529 100.972 68.415C100.908 68.7771 100.737 69.1131 100.48 69.3817ZM83.8068 34.3032C83.4444 33.9248 83.0058 33.6231 82.5185 33.4169C82.0312 33.2108 81.5055 33.1045 80.9743 33.1048H1.93563C1.55849 33.1048 1.18957 33.2121 0.874202 33.4136C0.558829 33.6151 0.31074 33.9019 0.160416 34.2388C0.0100923 34.5758 -0.0359181 34.9482 0.0280382 35.3103C0.0919944 35.6723 0.263131 36.0083 0.520422 36.277L17.2061 53.6968C17.5676 54.0742 18.0047 54.3752 18.4904 54.5814C18.9762 54.7875 19.5002 54.8944 20.0301 54.8952H99.0644C99.4415 54.8952 99.8104 54.7879 100.126 54.5864C100.441 54.3849 100.689 54.0981 100.84 53.7612C100.99 53.4242 101.036 53.0518 100.972 52.6897C100.908 52.3277 100.737 51.9917 100.48 51.723L83.8068 34.3032ZM1.93563 21.7905H80.9743C81.5055 21.7907 82.0312 21.6845 82.5185 21.4783C83.0058 21.2721 83.4444 20.9704 83.8068 20.592L100.48 3.17219C100.737 2.90357 100.908 2.56758 100.972 2.2055C101.036 1.84342 100.99 1.47103 100.84 1.13408C100.689 0.79713 100.441 0.510296 100.126 0.308823C99.8104 0.107349 99.4415 1.24074e-05 99.0644 0L20.0301 0C19.5002 0.000878397 18.9762 0.107699 18.4904 0.313848C18.0047 0.519998 17.5676 0.821087 17.2061 1.19848L0.524723 18.6183C0.267681 18.8866 0.0966198 19.2223 0.0325185 19.5839C-0.0315829 19.9456 0.0140624 20.3177 0.163856 20.6545C0.31365 20.9913 0.561081 21.2781 0.875804 21.4799C1.19053 21.6817 1.55886 21.7896 1.93563 21.7905Z' fill='%23FFFFFF'/%3E%3C/svg%3E`;
+// eslint-disable-next-line max-len
+const sendIconURI = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQyIiBoZWlnaHQ9Ijc0MiIgdmlld0JveD0iMCAwIDc0MiA3NDIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMzcxIDc0MkM1NzUuODk4IDc0MiA3NDIgNTc1Ljg5OCA3NDIgMzcxQzc0MiAxNjYuMTAyIDU3NS44OTggMCAzNzEgMEMxNjYuMTAyIDAgMCAxNjYuMTAyIDAgMzcxQzAgNTc1Ljg5OCAxNjYuMTAyIDc0MiAzNzEgNzQyWk01NjEuNjc0IDI4Ny43MzRDNTE4LjE0IDI3MS40NTMgNDkzLjY5MSAyNjMuNjAyIDQ1OC42NjUgMjYwLjMwNEM0NDkuMDcgMjU5LjQwMSA0NDAuNTU5IDI2Ni40NDcgNDM5LjY1NiAyNzYuMDQzQzQzOC43NTIgMjg1LjYzOSA0NDUuNzk5IDI5NC4xNSA0NTUuMzk0IDI5NS4wNTNDNDc0LjA0MSAyOTYuODA4IDQ4OS4xMzMgMjk5Ljk0MiA1MDguMDI4IDMwNS44NTFDNDk2Ljg4MSAzMTAuODQyIDQ4Ny42NTYgMzE1LjIyMSA0NzkuMzUyIDMxOS43OUM0NjEuOTA3IDMyOS4zODkgNDQ4LjQzNCAzMzkuODIgNDI4LjgzIDM1Ny43NThDNDIxLjcyIDM2NC4yNjQgNDIxLjIzIDM3NS4zMDIgNDI3LjczNiAzODIuNDEzQzQzNC4yNDIgMzg5LjUyMyA0NDUuMjggMzkwLjAxMyA0NTIuMzkxIDM4My41MDdDNDcwLjkyNiAzNjYuNTQ4IDQ4Mi4wOTcgMzU4LjExNiA0OTYuMTc3IDM1MC4zNjlDNTA2LjAwNCAzNDQuOTYyIDUxNy4yMTkgMzM5Ljg4NCA1MzMuMzc2IDMzMi44MTFDNTI5LjgxNyAzNTAuNjc2IDUyNS4xNTIgMzY0LjYyIDUxNi41OTYgMzgzLjA3MkM1MTIuNTQxIDM5MS44MTYgNTE2LjM0MyA0MDIuMTkxIDUyNS4wODYgNDA2LjI0NUM1MzMuODMgNDEwLjMgNTQ0LjIwNSA0MDYuNDk4IDU0OC4yNTkgMzk3Ljc1NUM1NjMuMTA2IDM2NS43MzcgNTY3Ljg1NSAzNDQuNDM3IDU3Mi44NjMgMzA2LjM1NUM1NzMuOTIyIDI5OC4zIDU2OS4yODMgMjkwLjU4IDU2MS42NzQgMjg3LjczNFpNMjk3LjYwOCA0NzkuMDcxQzI5My42MTEgNDY2LjgxOSAzMDQuNDAzIDQ1Ni4xMjIgMzE3LjI5IDQ1Ni4xMjJINDI0LjA4N0M0MzYuOTc0IDQ1Ni4xMjIgNDQ3Ljc2NiA0NjYuODE5IDQ0My43NjkgNDc5LjA3MUM0NDMuMTIzIDQ4MS4wNSA0NDIuMzkzIDQ4My4wMDUgNDQxLjU4IDQ4NC45MzJDNDM3LjcyNCA0OTQuMDY2IDQzMi4wNzIgNTAyLjM2NSA0MjQuOTQ3IDUwOS4zNTZDNDE3LjgyMSA1MTYuMzQ3IDQwOS4zNjIgNTIxLjg5MiA0MDAuMDUzIDUyNS42NzZDMzkwLjc0MyA1MjkuNDU5IDM4MC43NjUgNTMxLjQwNiAzNzAuNjg5IDUzMS40MDZDMzYwLjYxMiA1MzEuNDA2IDM1MC42MzQgNTI5LjQ1OSAzNDEuMzI0IDUyNS42NzZDMzMyLjAxNSA1MjEuODkyIDMyMy41NTYgNTE2LjM0NyAzMTYuNDMgNTA5LjM1NkMzMDkuMzA1IDUwMi4zNjUgMzAzLjY1MyA0OTQuMDY2IDI5OS43OTcgNDg0LjkzMkMyOTguOTg0IDQ4My4wMDUgMjk4LjI1NCA0ODEuMDUgMjk3LjYwOCA0NzkuMDcxWk0xNzQuOTM3IDI4OS4yNEMyMDYuOTE5IDI3NC41ODMgMjMyLjAxOCAyNjkuMTU4IDI3Ny44NiAyNjEuNDkxQzI4NS44NzMgMjYwLjE1MSAyOTMuNzUgMjY0LjUxOCAyOTYuODYgMjcyLjAyM0MzMTEuNTY1IDMwNy41MDcgMzE4LjEwMiAzMjguMzI4IDMyMS4yNTMgMzYzLjQ3OUMzMjIuMTE0IDM3My4wNzggMzE1LjAyOSAzODEuNTU4IDMwNS40MyAzODIuNDE4QzI5NS44MyAzODMuMjc5IDI4Ny4zNTEgMzc2LjE5NSAyODYuNDkgMzY2LjU5NUMyODQuNjc0IDM0Ni4zMzcgMjgxLjc0MyAzMzEuOTI5IDI3NS44OTIgMzE0LjY3OEMyNjUuNDM2IDMyOC44ODEgMjU4LjI2MyAzMzguODg3IDI1Mi40NTYgMzQ4LjQ4M0MyNDQuMTM2IDM2Mi4yMzIgMjM4LjY3NyAzNzUuMTIgMjMxLjEwNSAzOTkuMDc0QzIyOC4yIDQwOC4yNjQgMjE4LjM5NiA0MTMuMzU5IDIwOS4yMDYgNDEwLjQ1NEMyMDAuMDE2IDQwNy41NDkgMTk0LjkyMSAzOTcuNzQ1IDE5Ny44MjYgMzg4LjU1NUMyMDUuODM0IDM2My4yMTkgMjEyLjI4NyAzNDcuNDQ5IDIyMi41OTUgMzMwLjQxNEMyMjcuNTAyIDMyMi4zMDUgMjMzLjMwMiAzMTMuOSAyNDAuNDYgMzA0LjAwNEMyMjEuMTQyIDMwOC4zMzQgMjA2LjUwNSAzMTMuMTY2IDE4OS40NzkgMzIwLjk2OUMxODAuNzE3IDMyNC45ODQgMTcwLjM1OSAzMjEuMTM3IDE2Ni4zNDQgMzEyLjM3NUMxNjIuMzI4IDMwMy42MTQgMTY2LjE3NiAyOTMuMjU2IDE3NC45MzcgMjg5LjI0WiIgZmlsbD0iIzI2NThERCIvPgo8L3N2Zz4K';
 
 class Jupiter {
     constructor (runtime) {
@@ -46,6 +48,18 @@ class Jupiter {
                 },
 
                 {
+                    opcode: 'send',
+                    blockType: BlockType.REPORTER,
+                    text: '[SOLANA] Send',
+                    arguments: {
+                        SOLANA: {
+                            type: ArgumentType.IMAGE,
+                            dataURI: sendIconURI
+                        }
+                    }
+                },
+
+                {
                     opcode: 'fetchPrice',
                     blockType: BlockType.REPORTER,
                     text: '[JUPITER] Fetch price of token [ca]',
@@ -61,33 +75,33 @@ class Jupiter {
                     }
                 },
 
-                {
-                    opcode: 'swapToken',
-                    blockType: BlockType.REPORTER,
-                    text: '[JUPITER] Swap [amount] [inputMint] for CA:[ca] by [privateKey]',
-                    arguments: {
-                        privateKey: {
-                            type: ArgumentType.STRING,
-                            defaultValue: 'Private Key'
-                        },
-                        amount: {
-                            type: ArgumentType.NUMBER,
-                            defaultValue: 1
-                        },
-                        inputMint: {
-                            type: ArgumentType.STRING,
-                            defaultValue: 'Input Mint'
-                        },
-                        ca: {
-                            type: ArgumentType.STRING,
-                            defaultValue: 'Contract Address'
-                        },
-                        JUPITER: {
-                            type: ArgumentType.IMAGE,
-                            dataURI: JupIconURI
-                        }
-                    }
-                },
+                // {
+                //     opcode: 'swapToken',
+                //     blockType: BlockType.REPORTER,
+                //     text: '[JUPITER] Swap [amount] [inputMint] for CA:[ca] by [privateKey]',
+                //     arguments: {
+                //         privateKey: {
+                //             type: ArgumentType.STRING,
+                //             defaultValue: 'Private Key'
+                //         },
+                //         amount: {
+                //             type: ArgumentType.NUMBER,
+                //             defaultValue: 1
+                //         },
+                //         inputMint: {
+                //             type: ArgumentType.STRING,
+                //             defaultValue: 'Input Mint'
+                //         },
+                //         ca: {
+                //             type: ArgumentType.STRING,
+                //             defaultValue: 'Contract Address'
+                //         },
+                //         JUPITER: {
+                //             type: ArgumentType.IMAGE,
+                //             dataURI: JupIconURI
+                //         }
+                //     }
+                // },
 
                 {
                     opcode: 'swapTokenByUser',
@@ -113,25 +127,25 @@ class Jupiter {
                     }
                 },
 
-                {
-                    opcode: 'stake',
-                    blockType: BlockType.REPORTER,
-                    text: '[JUPITER] Stake [amount] Sol for JupSol by [privateKey]',
-                    arguments: {
-                        amount: {
-                            type: ArgumentType.NUMBER,
-                            defaultValue: 1
-                        },
-                        privateKey: {
-                            type: ArgumentType.STRING,
-                            defaultValue: 'Private Key'
-                        },
-                        JUPITER: {
-                            type: ArgumentType.IMAGE,
-                            dataURI: JupIconURI
-                        }
-                    }
-                },
+                // {
+                //     opcode: 'stake',
+                //     blockType: BlockType.REPORTER,
+                //     text: '[JUPITER] Stake [amount] Sol for JupSol by [privateKey]',
+                //     arguments: {
+                //         amount: {
+                //             type: ArgumentType.NUMBER,
+                //             defaultValue: 1
+                //         },
+                //         privateKey: {
+                //             type: ArgumentType.STRING,
+                //             defaultValue: 'Private Key'
+                //         },
+                //         JUPITER: {
+                //             type: ArgumentType.IMAGE,
+                //             dataURI: JupIconURI
+                //         }
+                //     }
+                // },
 
                 {
                     opcode: 'stakeByUser',
@@ -161,6 +175,10 @@ class Jupiter {
 
     sol () {
         return 'So11111111111111111111111111111111111111112';
+    }
+
+    send () {
+        return 'SENDdRQtYMWaQrBroBrJ2Q53fgVuq95CV9UPGEvpCxa';
     }
 
     async fetchPrice (args) {
