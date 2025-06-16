@@ -10,6 +10,10 @@ const token = require('@solana/spl-token');
 // Import the correct wallet adapter packages
 const {PhantomWalletAdapter} = require('@solana/wallet-adapter-phantom');
 const {BackpackWalletAdapter} = require('@solana/wallet-adapter-backpack');
+const {SolflareWalletAdapter} = require('@solana/wallet-adapter-solflare');
+const {SlopeWalletAdapter} = require('@solana/wallet-adapter-slope');
+const {GlowWalletAdapter} = require('@solana/wallet-adapter-glow');
+const {BraveWalletAdapter} = require('@solana/wallet-adapter-brave');
 
 // https://www.fffuel.co/eeencode/
 // https://www.site24x7.com/tools/image-to-datauri.html
@@ -29,15 +33,27 @@ class Solana {
         this.runtime = runtime;
         // Initialize wallet if not already done
         if (!Solana.wallet) {
-            try {
-                Solana.wallet = new PhantomWalletAdapter();
-            } catch (error) {
-                console.log('Phantom wallet not found, trying Backpack...');
+            const walletAdapters = [
+                {name: 'Phantom', adapter: PhantomWalletAdapter},
+                {name: 'Backpack', adapter: BackpackWalletAdapter},
+                {name: 'Solflare', adapter: SolflareWalletAdapter},
+                {name: 'Slope', adapter: SlopeWalletAdapter},
+                {name: 'Glow', adapter: GlowWalletAdapter},
+                {name: 'Brave', adapter: BraveWalletAdapter}
+            ];
+
+            for (const wallet of walletAdapters) {
                 try {
-                    Solana.wallet = new BackpackWalletAdapter();
-                } catch (backpackError) {
-                    console.error('Neither Phantom nor Backpack wallet found:', backpackError);
+                    Solana.wallet = new wallet.adapter();
+                    console.log(`Successfully connected to ${wallet.name} wallet`);
+                    break;
+                } catch (error) {
+                    console.log(`${wallet.name} wallet not found, trying next...`);
                 }
+            }
+
+            if (!Solana.wallet) {
+                console.error('No supported wallet found. Please install one of the supported wallets.');
             }
         }
     }
@@ -387,8 +403,29 @@ class Solana {
         const connection = new web3.Connection(Solana.net);
         
         try {
-            if (!Solana.wallet.connected) {
-                await Solana.wallet.connect();
+            const walletAdapters = [
+                {name: 'Phantom', adapter: PhantomWalletAdapter},
+                {name: 'Backpack', adapter: BackpackWalletAdapter},
+                {name: 'Solflare', adapter: SolflareWalletAdapter},
+                {name: 'Slope', adapter: SlopeWalletAdapter},
+                {name: 'Glow', adapter: GlowWalletAdapter},
+                {name: 'Brave', adapter: BraveWalletAdapter}
+            ];
+
+            for (const wallet of walletAdapters) {
+                try {
+                    Solana.wallet = new wallet.adapter();
+                    if (!Solana.wallet.connected) {
+                        await Solana.wallet.connect();
+                    }
+                    break;
+                } catch (error) {
+                    console.log(`${wallet.name} wallet not found, trying next...`);
+                }
+            }
+
+            if (!Solana.wallet) {
+                throw new Error('No supported wallet found. Please install one of the supported wallets.');
             }
             
             const transaction = new web3.Transaction().add(
@@ -419,8 +456,29 @@ class Solana {
         const connection = new web3.Connection(Solana.net);
         
         try {
-            if (!Solana.wallet.connected) {
-                await Solana.wallet.connect();
+            const walletAdapters = [
+                {name: 'Phantom', adapter: PhantomWalletAdapter},
+                {name: 'Backpack', adapter: BackpackWalletAdapter},
+                {name: 'Solflare', adapter: SolflareWalletAdapter},
+                {name: 'Slope', adapter: SlopeWalletAdapter},
+                {name: 'Glow', adapter: GlowWalletAdapter},
+                {name: 'Brave', adapter: BraveWalletAdapter}
+            ];
+
+            for (const wallet of walletAdapters) {
+                try {
+                    Solana.wallet = new wallet.adapter();
+                    if (!Solana.wallet.connected) {
+                        await Solana.wallet.connect();
+                    }
+                    break;
+                } catch (error) {
+                    console.log(`${wallet.name} wallet not found, trying next...`);
+                }
+            }
+
+            if (!Solana.wallet) {
+                throw new Error('No supported wallet found. Please install one of the supported wallets.');
             }
 
             // Check if it's wrapped SOL
