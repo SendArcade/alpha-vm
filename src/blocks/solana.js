@@ -9,6 +9,7 @@ const token = require('@solana/spl-token');
 
 // Import the correct wallet adapter packages
 const {PhantomWalletAdapter} = require('@solana/wallet-adapter-phantom');
+const {BackpackWalletAdapter} = require('@solana/wallet-adapter-backpack');
 
 // https://www.fffuel.co/eeencode/
 // https://www.site24x7.com/tools/image-to-datauri.html
@@ -28,7 +29,16 @@ class Solana {
         this.runtime = runtime;
         // Initialize wallet if not already done
         if (!Solana.wallet) {
-            Solana.wallet = new PhantomWalletAdapter();
+            try {
+                Solana.wallet = new PhantomWalletAdapter();
+            } catch (error) {
+                console.log('Phantom wallet not found, trying Backpack...');
+                try {
+                    Solana.wallet = new BackpackWalletAdapter();
+                } catch (backpackError) {
+                    console.error('Neither Phantom nor Backpack wallet found:', backpackError);
+                }
+            }
         }
     }
 
