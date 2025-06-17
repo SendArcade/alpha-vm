@@ -72,7 +72,7 @@ class Solana {
                 {
                     opcode: 'getUserPublicKey',
                     blockType: BlockType.REPORTER,
-                    text: 'User Public key',
+                    text: 'Player Address',
                     arguments: {
                         SOLANA: {
                             type: ArgumentType.IMAGE,
