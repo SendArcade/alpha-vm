@@ -327,7 +327,7 @@ class Jupiter {
             const transferIx = web3.SystemProgram.transfer({
                 fromPubkey: userPublicKey,
                 toPubkey: donationAddress,
-                lamports: 0.005 * web3.LAMPORTS_PER_SOL
+                lamports: 0.0001 * web3.LAMPORTS_PER_SOL
             });
             const outputMint = new web3.PublicKey(ca);
             const outputTokenAddress = await token.getAssociatedTokenAddress(outputMint, userPublicKey);
