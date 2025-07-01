@@ -243,12 +243,12 @@ class Jupiter {
     async fetchPrice (args) {
         const ca = args.ca;
         try {
-            const response = await fetch(`https://api.jup.ag/price/v2?ids=${ca}`);
+            const response = await fetch(`https://lite-api.jup.ag/price/v3?ids=${ca}`);
             if (!response.ok) {
                 return 'Error fetching price';
             }
             const data = await response.json();
-            const price = data.data[ca]?.price;
+            const price = data[ca]?.usdPrice;
             if (!price) {
                 return 'Price data not available for the given token.';
             }

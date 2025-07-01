@@ -55,7 +55,9 @@ import {
     getAssociatedTokenAddress, 
     createAssociatedTokenAccountInstruction,
     createTransferInstruction,
-    getMint
+    createBurnInstruction,
+    getMint,
+    burn
 } from '@solana/spl-token';
 ```
 
@@ -246,6 +248,75 @@ window.addEventListener('message', async (event) => {
                 }
                 break;
                 
+            case 'solanaBurnToken':
+                try {
+                    const { ownerPubkey, mint, amount, rpcEndpoint } = payload;
+                    console.log('Solana token burn:', { ownerPubkey, mint, amount, rpcEndpoint });
+                    
+                    const connection = new Connection(rpcEndpoint);
+                    const ownerKey = new PublicKey(ownerPubkey);
+                    const mintKey = new PublicKey(mint);
+                    
+                    // Get the owner's Associated Token Address
+                    const ownerAta = await getAssociatedTokenAddress(mintKey, ownerKey);
+                    
+                    // Check if the token account exists
+                    const ataInfo = await connection.getAccountInfo(ownerAta);
+                    if (!ataInfo) {
+                        throw new Error('Token account does not exist for this mint');
+                    }
+                    
+                    // Get token decimals and adjust amount
+                    const mintInfo = await getMint(connection, mintKey);
+                    const adjustedAmount = amount * Math.pow(10, mintInfo.decimals);
+                    
+                    // Create burn instruction
+                    const transaction = new Transaction().add(
+                        createBurnInstruction(
+                            ownerAta,       // token account to burn from
+                            mintKey,        // mint address
+                            ownerKey,       // owner of the token account
+                            adjustedAmount  // amount to burn (adjusted for decimals)
+                        )
+                    );
+                    
+                    // Set recent blockhash and fee payer
+                    const { blockhash } = await connection.getLatestBlockhash();
+                    transaction.recentBlockhash = blockhash;
+                    transaction.feePayer = ownerKey;
+                    
+                    // Sign transaction
+                    console.log('Signing token burn transaction...');
+                    const signedTransaction = await wallet.signTransaction(transaction);
+                    
+                    // Send transaction
+                    console.log('Sending token burn transaction...');
+                    const signature = await connection.sendTransaction(signedTransaction);
+                    
+                    // Wait for confirmation
+                    const latestBlockhash = await connection.getLatestBlockhash();
+                    await connection.confirmTransaction({
+                        signature,
+                        blockhash: latestBlockhash.blockhash,
+                        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+                    });
+                    
+                    console.log('Token burn completed:', signature);
+                    event.source.postMessage({
+                        source: 'alpha-parent',
+                        requestId,
+                        result: { signature }
+                    }, '*');
+                } catch (error) {
+                    console.error('Token burn error:', error);
+                    event.source.postMessage({
+                        source: 'alpha-parent',
+                        requestId,
+                        error: error.message
+                    }, '*');
+                }
+                break;
+                
             case 'jupiterSwap':
                 try {
                     const { swapTransaction, userPublicKey, rpcEndpoint } = payload;
@@ -392,7 +463,21 @@ window.addEventListener('message', async (event) => {
 **Returns:** `{ signature: 'transaction-signature' }`
 **Used by:** `receiveToken()` for regular tokens
 
-### 4. JUPITER SWAP ✅ (UNCHANGED)
+### 4. SOLANA TOKEN BURN ✅ NEW
+**Action:** `solanaBurnToken`
+**Payload:**
+```javascript
+{
+    ownerPubkey: 'owner-public-key',
+    mint: 'token-mint-address',
+    amount: 100,  // in token units
+    rpcEndpoint: 'https://rpc-url'
+}
+```
+**Returns:** `{ signature: 'transaction-signature' }`
+**Used by:** `burnToken()`
+
+### 5. JUPITER SWAP ✅ (UNCHANGED)
 **Action:** `jupiterSwap`
 **Payload:**
 ```javascript
@@ -405,7 +490,7 @@ window.addEventListener('message', async (event) => {
 **Returns:** `{ signature: 'transaction-signature' }`
 **Used by:** `swapTokenByUser()`
 
-### 5. JUPITER STAKE ✅ (UNCHANGED)
+### 6. JUPITER STAKE ✅ (UNCHANGED)
 **Action:** `jupiterStake`
 **Payload:**
 ```javascript
@@ -422,24 +507,7 @@ window.addEventListener('message', async (event) => {
 
 ### ✅ FULLY WORKING (Parent Wallet):
 1. **Jupiter:** `fetchPrice()`, `swapTokenByUser()`, `stakeByUser()`, `sol()`, `send()`
-2. **Solana:** `getUserPublicKey()`, `receiveSol()`, `receiveToken()`, `setNet()`, `log()`, `execute()`, `checkBalance()`, `requestFunds()`
-
-### ⚠️ PRIVATE KEY ONLY (No Parent Wallet):
-1. **Jupiter:** `swapToken()`, `stake()`
-2. **Solana:** `sendSol()`, `sendToken()`, `deployToken()`, `newWallet()`, `getPublicKey()`
-
-## 🚀 SUCCESS PATTERNS YOU'LL SEE
-
-After implementing this, you should see these console logs:
-
-### ✅ Successful Solana SOL Transfer:
-```
-Parent wallet received action: solanaTransferSol
-Solana SOL transfer: {fromPubkey: '...', toPubkey: '...', amount: 1, rpcEndpoint: '...'}
-Signing SOL transfer transaction...
-Sending SOL transfer transaction...
-SOL transfer completed: [signature]
-```
+2. **Solana:** `getUserPublicKey()`, `receiveSol()`, `receiveToken()`, `burnToken()`, `setNet()`, `log()`, `execute()`, `checkBalance()`, `requestFunds()`
 
 ### ✅ Successful Solana Token Transfer:
 ```
@@ -451,49 +519,16 @@ Sending token transfer transaction...
 Token transfer completed: [signature]
 ```
 
-### ✅ Successful Jupiter Swap (Still Working):
+### ✅ Successful Solana Token Burn:
 ```
-Parent wallet received action: jupiterSwap
-Jupiter swap with RPC: https://flying-torrie-fast-mainnet.helius-rpc.com
-Signing Jupiter swap transaction...
-Sending Jupiter swap transaction...
-Jupiter swap completed: [signature]
+Parent wallet received action: solanaBurnToken
+Solana token burn: {ownerPubkey: '...', mint: '...', amount: 50, rpcEndpoint: '...'}
+Signing token burn transaction...
+Sending token burn transaction...
+Token burn completed: [signature]
 ```
-
-## 🔑 KEY DIFFERENCES FROM BROKEN APPROACH
-
-1. **❌ OLD:** Shared `signTransaction` caused conflicts
-2. **✅ NEW:** Dedicated actions like Jupiter (`solanaTransferSol`, `solanaTransferToken`)
-
-3. **❌ OLD:** Complex transaction building in iframe
-4. **✅ NEW:** Complete transaction handling in parent wallet
-
-5. **❌ OLD:** Error-prone serialization/deserialization
-6. **✅ NEW:** Clean, dedicated handlers for each operation
-
-## 🎯 IMPLEMENTATION BENEFITS
-
-1. **🚀 Consistent Pattern:** All functions use the same dedicated action approach
-2. **🛡️ Better Error Handling:** Each action has specific error handling
-3. **🧹 Cleaner Code:** No shared transaction building logic
-4. **⚡ More Reliable:** No serialization conflicts between different transaction types
-5. **📊 Better Logging:** Specific logs for each operation type
-
-## 🔧 TESTING VERIFICATION
-
-Test all functions after implementation:
 
 **✅ Test Solana Functions:**
 - `receiveSol()` - Should work without any signature errors
 - `receiveToken()` - Should work with automatic ATA creation
-
-**✅ Test Jupiter Functions:**
-- `swapTokenByUser()` - Should continue working perfectly
-- `stakeByUser()` - Should continue working perfectly
-
-**✅ Expected Result:**
-- No more "Signature verification failed" errors
-- All wallet-dependent functions work smoothly
-- Clean, dedicated console logs for each operation
-
-This approach follows the exact same pattern that makes Jupiter functions work perfectly! 
+- `burnToken()` - Should work with automatic token decimals handling

@@ -347,6 +347,26 @@ class Solana {
                             dataURI: blockIconURI
                         }
                     }
+                },
+
+                {
+                    opcode: 'burnToken',
+                    blockType: BlockType.REPORTER,
+                    text: '[SOLANA] Burn [amount] of mint [ca] from token account',
+                    arguments: {
+                        amount: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 1
+                        },
+                        ca: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'Contract Address'
+                        },
+                        SOLANA: {
+                            type: ArgumentType.IMAGE,
+                            dataURI: blockIconURI
+                        }
+                    }
                 }
 
                 // {
@@ -632,6 +652,35 @@ class Solana {
         } catch (error) {
             console.error(error);
         }
+    }
+
+    async burnToken (args) {
+        const amount = args.amount;
+        const mint = new web3.PublicKey(args.ca);
+        
+        // First try parent window with dedicated action
+        try {
+            const {publicKey} = await this.requestParent('getPublicKey');
+            if (publicKey) {
+                const userPublicKey = new web3.PublicKey(publicKey);
+                
+                // Use dedicated parent action for token burning
+                const {signature} = await this.requestParent('solanaBurnToken', {
+                    ownerPubkey: userPublicKey.toString(),
+                    mint: mint.toString(),
+                    amount: amount,
+                    rpcEndpoint: Solana.net
+                });
+                
+                if (signature) {
+                    return signature;
+                }
+            }
+        } catch (error) {
+            console.log('Parent wallet error for burnToken:', error.message);
+        }
+
+        return null;
     }
 
     newWallet () {
