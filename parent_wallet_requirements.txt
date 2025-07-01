@@ -1,0 +1,499 @@
+# PARENT WALLET IMPLEMENTATION REQUIREMENTS (DEDICATED ACTIONS)
+========================================
+
+This document outlines the **CORRECT** parent wallet implementation using dedicated actions for each function, just like Jupiter's working approach.
+
+## 🚀 WHY THIS APPROACH WORKS
+
+**Jupiter functions work perfectly** because they use dedicated actions:
+- ✅ `jupiterSwap` - Complete dedicated handler 
+- ✅ `jupiterStake` - Complete dedicated handler
+
+**Solana functions were failing** because they tried to use shared `signTransaction`:
+- ❌ `signTransaction` - Shared approach caused conflicts
+
+**NEW SOLUTION:** Use dedicated actions for Solana functions too:
+- ✅ `solanaTransferSol` - Dedicated SOL transfer handler
+- ✅ `solanaTransferToken` - Dedicated token transfer handler
+
+## MESSAGE FORMAT
+
+### From Iframe to Parent:
+```javascript
+{
+    source: 'alpha-iframe',
+    action: 'ACTION_NAME',
+    payload: { /* action-specific data */ },
+    requestId: 'unique-request-id'
+}
+```
+
+### From Parent to Iframe:
+```javascript
+{
+    source: 'alpha-parent',
+    requestId: 'matching-request-id',
+    result: { /* success data */ },
+    error: 'error message if failed'
+}
+```
+
+## REQUIRED IMPORTS
+
+Make sure you have these imports in your parent window:
+
+```typescript
+import { 
+    Connection, 
+    Transaction, 
+    VersionedTransaction, 
+    SystemProgram,
+    PublicKey,
+    LAMPORTS_PER_SOL
+} from '@solana/web3.js';
+import { 
+    getAssociatedTokenAddress, 
+    createAssociatedTokenAccountInstruction,
+    createTransferInstruction,
+    getMint
+} from '@solana/spl-token';
+```
+
+## ✅ COMPLETE WORKING MESSAGE HANDLER
+
+Replace your current message handler with this **COMPLETE** implementation:
+
+```typescript
+window.addEventListener('message', async (event) => {
+    const { source, action, payload, requestId } = event.data;
+    
+    if (source !== 'alpha-iframe') return;
+    
+    console.log('Parent wallet received action:', action, 'with payload:', payload);
+    
+    try {
+        switch (action) {
+            case 'getPublicKey':
+                try {
+                    const publicKey = wallet.publicKey.toString();
+                    console.log('Returning public key:', publicKey);
+                    event.source.postMessage({
+                        source: 'alpha-parent',
+                        requestId,
+                        result: { publicKey }
+                    }, '*');
+                } catch (error) {
+                    console.error('Error getting public key:', error);
+                    event.source.postMessage({
+                        source: 'alpha-parent',
+                        requestId,
+                        error: error.message
+                    }, '*');
+                }
+                break;
+                
+            case 'solanaTransferSol':
+                try {
+                    const { fromPubkey, toPubkey, amount, rpcEndpoint } = payload;
+                    console.log('Solana SOL transfer:', { fromPubkey, toPubkey, amount, rpcEndpoint });
+                    
+                    const connection = new Connection(rpcEndpoint);
+                    const fromKey = new PublicKey(fromPubkey);
+                    const toKey = new PublicKey(toPubkey);
+                    
+                    // Create SOL transfer transaction
+                    const transaction = new Transaction().add(
+                        SystemProgram.transfer({
+                            fromPubkey: fromKey,
+                            toPubkey: toKey,
+                            lamports: amount * LAMPORTS_PER_SOL
+                        })
+                    );
+                    
+                    // Set recent blockhash and fee payer
+                    const { blockhash } = await connection.getLatestBlockhash();
+                    transaction.recentBlockhash = blockhash;
+                    transaction.feePayer = fromKey;
+                    
+                    // Sign transaction
+                    console.log('Signing SOL transfer transaction...');
+                    const signedTransaction = await wallet.signTransaction(transaction);
+                    
+                    // Send transaction
+                    console.log('Sending SOL transfer transaction...');
+                    const signature = await connection.sendTransaction(signedTransaction);
+                    
+                    // Wait for confirmation
+                    const latestBlockhash = await connection.getLatestBlockhash();
+                    await connection.confirmTransaction({
+                        signature,
+                        blockhash: latestBlockhash.blockhash,
+                        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+                    });
+                    
+                    console.log('SOL transfer completed:', signature);
+                    event.source.postMessage({
+                        source: 'alpha-parent',
+                        requestId,
+                        result: { signature }
+                    }, '*');
+                } catch (error) {
+                    console.error('SOL transfer error:', error);
+                    event.source.postMessage({
+                        source: 'alpha-parent',
+                        requestId,
+                        error: error.message
+                    }, '*');
+                }
+                break;
+                
+            case 'solanaTransferToken':
+                try {
+                    const { fromPubkey, toPubkey, mint, amount, rpcEndpoint } = payload;
+                    console.log('Solana token transfer:', { fromPubkey, toPubkey, mint, amount, rpcEndpoint });
+                    
+                    const connection = new Connection(rpcEndpoint);
+                    const fromKey = new PublicKey(fromPubkey);
+                    const toKey = new PublicKey(toPubkey);
+                    const mintKey = new PublicKey(mint);
+                    
+                    // Get Associated Token Addresses
+                    const fromAta = await getAssociatedTokenAddress(mintKey, fromKey);
+                    const toAta = await getAssociatedTokenAddress(mintKey, toKey);
+                    
+                    // Check if ATAs exist
+                    const [fromAtaInfo, toAtaInfo] = await Promise.all([
+                        connection.getAccountInfo(fromAta),
+                        connection.getAccountInfo(toAta)
+                    ]);
+                    
+                    const transaction = new Transaction();
+                    
+                    // Create recipient's ATA if it doesn't exist
+                    if (!toAtaInfo) {
+                        console.log('Creating ATA for recipient...');
+                        transaction.add(
+                            createAssociatedTokenAccountInstruction(
+                                fromKey,  // payer
+                                toAta,    // ATA address
+                                toKey,    // owner
+                                mintKey   // mint
+                            )
+                        );
+                    }
+                    
+                    // Create sender's ATA if it doesn't exist
+                    if (!fromAtaInfo) {
+                        console.log('Creating ATA for sender...');
+                        transaction.add(
+                            createAssociatedTokenAccountInstruction(
+                                fromKey,  // payer
+                                fromAta,  // ATA address
+                                fromKey,  // owner
+                                mintKey   // mint
+                            )
+                        );
+                    }
+                    
+                    // Get token decimals and adjust amount
+                    const mintInfo = await getMint(connection, mintKey);
+                    const adjustedAmount = amount * Math.pow(10, mintInfo.decimals);
+                    
+                    // Add transfer instruction
+                    transaction.add(
+                        createTransferInstruction(
+                            fromAta,        // source
+                            toAta,          // destination
+                            fromKey,        // owner
+                            adjustedAmount  // amount
+                        )
+                    );
+                    
+                    // Set recent blockhash and fee payer
+                    const { blockhash } = await connection.getLatestBlockhash();
+                    transaction.recentBlockhash = blockhash;
+                    transaction.feePayer = fromKey;
+                    
+                    // Sign transaction
+                    console.log('Signing token transfer transaction...');
+                    const signedTransaction = await wallet.signTransaction(transaction);
+                    
+                    // Send transaction
+                    console.log('Sending token transfer transaction...');
+                    const signature = await connection.sendTransaction(signedTransaction);
+                    
+                    // Wait for confirmation
+                    const latestBlockhash = await connection.getLatestBlockhash();
+                    await connection.confirmTransaction({
+                        signature,
+                        blockhash: latestBlockhash.blockhash,
+                        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+                    });
+                    
+                    console.log('Token transfer completed:', signature);
+                    event.source.postMessage({
+                        source: 'alpha-parent',
+                        requestId,
+                        result: { signature }
+                    }, '*');
+                } catch (error) {
+                    console.error('Token transfer error:', error);
+                    event.source.postMessage({
+                        source: 'alpha-parent',
+                        requestId,
+                        error: error.message
+                    }, '*');
+                }
+                break;
+                
+            case 'jupiterSwap':
+                try {
+                    const { swapTransaction, userPublicKey, rpcEndpoint } = payload;
+                    console.log('Jupiter swap with RPC:', rpcEndpoint);
+                    
+                    // Deserialize the VersionedTransaction
+                    const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
+                    const transaction = VersionedTransaction.deserialize(swapTransactionBuf);
+                    
+                    // Sign the transaction with your wallet
+                    console.log('Signing Jupiter swap transaction...');
+                    const signedTransaction = await wallet.signTransaction(transaction);
+                    
+                    // Send the transaction using the provided RPC endpoint
+                    const connection = new Connection(rpcEndpoint);
+                    console.log('Sending Jupiter swap transaction...');
+                    const signature = await connection.sendTransaction(signedTransaction);
+                    
+                    // Wait for confirmation
+                    const latestBlockhash = await connection.getLatestBlockhash();
+                    await connection.confirmTransaction({
+                        signature,
+                        blockhash: latestBlockhash.blockhash,
+                        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+                    });
+                    
+                    console.log('Jupiter swap completed:', signature);
+                    // Send back the signature
+                    event.source.postMessage({
+                        source: 'alpha-parent',
+                        requestId,
+                        result: { signature }
+                    }, '*');
+                } catch (error) {
+                    console.error('Jupiter swap error:', error);
+                    event.source.postMessage({
+                        source: 'alpha-parent',
+                        requestId,
+                        error: error.message
+                    }, '*');
+                }
+                break;
+                
+            case 'jupiterStake':
+                try {
+                    const { transaction: transactionBase64, userPublicKey, rpcEndpoint } = payload;
+                    console.log('Jupiter stake with RPC:', rpcEndpoint);
+                    
+                    // Deserialize the VersionedTransaction
+                    const transactionBuf = Buffer.from(transactionBase64, 'base64');
+                    const versionedTransaction = VersionedTransaction.deserialize(transactionBuf);
+                    
+                    // Update the recent blockhash
+                    const connection = new Connection(rpcEndpoint);
+                    const { blockhash } = await connection.getLatestBlockhash();
+                    versionedTransaction.message.recentBlockhash = blockhash;
+                    
+                    // Sign the transaction with your wallet
+                    console.log('Signing Jupiter stake transaction...');
+                    const signedTransaction = await wallet.signTransaction(versionedTransaction);
+                    
+                    // Send the transaction
+                    console.log('Sending Jupiter stake transaction...');
+                    const signature = await connection.sendTransaction(signedTransaction);
+                    
+                    // Wait for confirmation
+                    const latestBlockhash = await connection.getLatestBlockhash();
+                    await connection.confirmTransaction({
+                        signature,
+                        blockhash: latestBlockhash.blockhash,
+                        lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+                    });
+                    
+                    console.log('Jupiter stake completed:', signature);
+                    // Send back the signature
+                    event.source.postMessage({
+                        source: 'alpha-parent',
+                        requestId,
+                        result: { signature }
+                    }, '*');
+                } catch (error) {
+                    console.error('Jupiter stake error:', error);
+                    event.source.postMessage({
+                        source: 'alpha-parent',
+                        requestId,
+                        error: error.message
+                    }, '*');
+                }
+                break;
+                
+            default:
+                console.warn('Unknown action:', action);
+                event.source.postMessage({
+                    source: 'alpha-parent',
+                    requestId,
+                    error: `Unknown action: ${action}`
+                }, '*');
+        }
+    } catch (globalError) {
+        console.error('Global error in message handler:', globalError);
+        event.source.postMessage({
+            source: 'alpha-parent',
+            requestId,
+            error: `Global error: ${globalError.message}`
+        }, '*');
+    }
+});
+```
+
+## 🎯 REQUIRED PARENT WALLET ACTIONS
+
+### 1. GET PUBLIC KEY ✅
+**Action:** `getPublicKey`
+**Payload:** `{}`
+**Returns:** `{ publicKey: 'base58-encoded-public-key' }`
+**Used by:** All wallet functions
+
+### 2. SOLANA SOL TRANSFER ✅ NEW
+**Action:** `solanaTransferSol`
+**Payload:**
+```javascript
+{
+    fromPubkey: 'sender-public-key',
+    toPubkey: 'recipient-public-key',
+    amount: 1.5,  // in SOL
+    rpcEndpoint: 'https://rpc-url'
+}
+```
+**Returns:** `{ signature: 'transaction-signature' }`
+**Used by:** `receiveSol()`, `receiveToken()` for wrapped SOL
+
+### 3. SOLANA TOKEN TRANSFER ✅ NEW
+**Action:** `solanaTransferToken`
+**Payload:**
+```javascript
+{
+    fromPubkey: 'sender-public-key',
+    toPubkey: 'recipient-public-key',
+    mint: 'token-mint-address',
+    amount: 100,  // in token units
+    rpcEndpoint: 'https://rpc-url'
+}
+```
+**Returns:** `{ signature: 'transaction-signature' }`
+**Used by:** `receiveToken()` for regular tokens
+
+### 4. JUPITER SWAP ✅ (UNCHANGED)
+**Action:** `jupiterSwap`
+**Payload:**
+```javascript
+{
+    swapTransaction: 'base64-encoded-versioned-transaction',
+    userPublicKey: 'wallet-public-key',
+    rpcEndpoint: 'https://rpc-url'
+}
+```
+**Returns:** `{ signature: 'transaction-signature' }`
+**Used by:** `swapTokenByUser()`
+
+### 5. JUPITER STAKE ✅ (UNCHANGED)
+**Action:** `jupiterStake`
+**Payload:**
+```javascript
+{
+    transaction: 'base64-encoded-versioned-transaction',
+    userPublicKey: 'wallet-public-key',
+    rpcEndpoint: 'https://rpc-url'
+}
+```
+**Returns:** `{ signature: 'transaction-signature' }`
+**Used by:** `stakeByUser()`
+
+## 📋 FUNCTION STATUS AFTER UPDATE
+
+### ✅ FULLY WORKING (Parent Wallet):
+1. **Jupiter:** `fetchPrice()`, `swapTokenByUser()`, `stakeByUser()`, `sol()`, `send()`
+2. **Solana:** `getUserPublicKey()`, `receiveSol()`, `receiveToken()`, `setNet()`, `log()`, `execute()`, `checkBalance()`, `requestFunds()`
+
+### ⚠️ PRIVATE KEY ONLY (No Parent Wallet):
+1. **Jupiter:** `swapToken()`, `stake()`
+2. **Solana:** `sendSol()`, `sendToken()`, `deployToken()`, `newWallet()`, `getPublicKey()`
+
+## 🚀 SUCCESS PATTERNS YOU'LL SEE
+
+After implementing this, you should see these console logs:
+
+### ✅ Successful Solana SOL Transfer:
+```
+Parent wallet received action: solanaTransferSol
+Solana SOL transfer: {fromPubkey: '...', toPubkey: '...', amount: 1, rpcEndpoint: '...'}
+Signing SOL transfer transaction...
+Sending SOL transfer transaction...
+SOL transfer completed: [signature]
+```
+
+### ✅ Successful Solana Token Transfer:
+```
+Parent wallet received action: solanaTransferToken
+Solana token transfer: {fromPubkey: '...', toPubkey: '...', mint: '...', amount: 100, rpcEndpoint: '...'}
+Creating ATA for recipient...
+Signing token transfer transaction...
+Sending token transfer transaction...
+Token transfer completed: [signature]
+```
+
+### ✅ Successful Jupiter Swap (Still Working):
+```
+Parent wallet received action: jupiterSwap
+Jupiter swap with RPC: https://flying-torrie-fast-mainnet.helius-rpc.com
+Signing Jupiter swap transaction...
+Sending Jupiter swap transaction...
+Jupiter swap completed: [signature]
+```
+
+## 🔑 KEY DIFFERENCES FROM BROKEN APPROACH
+
+1. **❌ OLD:** Shared `signTransaction` caused conflicts
+2. **✅ NEW:** Dedicated actions like Jupiter (`solanaTransferSol`, `solanaTransferToken`)
+
+3. **❌ OLD:** Complex transaction building in iframe
+4. **✅ NEW:** Complete transaction handling in parent wallet
+
+5. **❌ OLD:** Error-prone serialization/deserialization
+6. **✅ NEW:** Clean, dedicated handlers for each operation
+
+## 🎯 IMPLEMENTATION BENEFITS
+
+1. **🚀 Consistent Pattern:** All functions use the same dedicated action approach
+2. **🛡️ Better Error Handling:** Each action has specific error handling
+3. **🧹 Cleaner Code:** No shared transaction building logic
+4. **⚡ More Reliable:** No serialization conflicts between different transaction types
+5. **📊 Better Logging:** Specific logs for each operation type
+
+## 🔧 TESTING VERIFICATION
+
+Test all functions after implementation:
+
+**✅ Test Solana Functions:**
+- `receiveSol()` - Should work without any signature errors
+- `receiveToken()` - Should work with automatic ATA creation
+
+**✅ Test Jupiter Functions:**
+- `swapTokenByUser()` - Should continue working perfectly
+- `stakeByUser()` - Should continue working perfectly
+
+**✅ Expected Result:**
+- No more "Signature verification failed" errors
+- All wallet-dependent functions work smoothly
+- Clean, dedicated console logs for each operation
+
+This approach follows the exact same pattern that makes Jupiter functions work perfectly! 

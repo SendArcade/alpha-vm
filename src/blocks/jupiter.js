@@ -374,7 +374,8 @@ class Jupiter {
                         txn.feePayer = userPublicKey;
                         
                         const {signature} = await this.requestParent('signTransaction', {
-                            transaction: txn.serialize().toString('base64')
+                            transaction: txn.serialize().toString('base64'),
+                            rpcEndpoint: Solana.net
                         });
                         
                         if (signature) {
@@ -400,7 +401,8 @@ class Jupiter {
                         txn.feePayer = userPublicKey;
                         
                         const {signature} = await this.requestParent('signTransaction', {
-                            transaction: txn.serialize().toString('base64')
+                            transaction: txn.serialize().toString('base64'),
+                            rpcEndpoint: Solana.net
                         });
                         
                         if (signature) {
@@ -443,15 +445,14 @@ class Jupiter {
                     rpcEndpoint: Solana.net
                 });
                 
-                if (signature) {
-                    return signature;
-                }
+                return signature || null;
             }
         } catch (error) {
             console.log('Parent wallet not available, trying local wallet...');
         }
 
-        // Fallback to local wallet
+        // Fallback to local wallet - COMMENTED OUT
+        /*
         try {
             const walletAdapters = [
                 {name: 'Phantom', adapter: PhantomWalletAdapter},
@@ -517,6 +518,9 @@ class Jupiter {
             console.error('JupSOL staking error:', error);
             return null;
         }
+        */
+        
+        return null;
     }
 
     async getTokenAmount (connection, mint, amount) {
@@ -606,7 +610,6 @@ class Jupiter {
 
     async stakeByUser (args) {
         const amount = args.amount;
-        const connection = new web3.Connection(Solana.net);
         
         // First try parent window
         try {
@@ -644,7 +647,8 @@ class Jupiter {
             console.log('Parent wallet not available, trying local wallet...');
         }
 
-        // Fallback to local wallet
+        // Fallback to local wallet - COMMENTED OUT
+        /*
         try {
             const walletAdapters = [
                 {name: 'Phantom', adapter: PhantomWalletAdapter},
@@ -710,6 +714,9 @@ class Jupiter {
             console.error('JupSOL staking error:', error);
             return null;
         }
+        */
+
+        return null;
     }
 
 }

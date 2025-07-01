@@ -3,7 +3,6 @@ const BlockType = require('../extension-support/block-type');
 const ArgumentType = require('../extension-support/argument-type');
 const web3 = require('@solana/web3.js');
 const bs58 = require('bs58');
-const {Buffer} = require('buffer');
 const token = require('@solana/spl-token');
 // const JUP_API = 'https://quote-api.jup.ag/v6';
 
@@ -398,17 +397,22 @@ class Solana {
     }
 
     async getUserPublicKey () {
+        // First try parent window
         try {
-            // First try parent window
             const {publicKey} = await this.requestParent('getPublicKey');
             if (publicKey) {
                 return publicKey;
             }
         } catch (error) {
-            console.log('Parent wallet not available, trying local wallet...');
+            // Only log once, not repeatedly
+            if (!Solana._loggedParentError) {
+                console.log('Parent wallet error for getUserPublicKey:', error.message);
+                Solana._loggedParentError = true;
+            }
         }
 
-        // Fallback to local wallet
+        // Fallback to local wallet - COMMENTED OUT
+        /*
         try {
             if (Solana.wallet) {
                 if (!Solana.wallet.connected) {
@@ -421,22 +425,20 @@ class Solana {
         } catch (error) {
             console.error('Error getting public key:', error);
         }
+        */
         
         return null;
     }
 
     setNet (args) {
-        const setNet = args.net;
-        switch (setNet) {
-        case 'mainnet-beta':
+        if (args.net === 'devnet') {
+            Solana.net = 'https://api.devnet.solana.com';
+        } else if (args.net === 'testnet') {
+            Solana.net = 'https://api.testnet.solana.com';
+        } else if (args.net === 'mainnet-beta') {
             Solana.net = 'https://flying-torrie-fast-mainnet.helius-rpc.com';
-            break;
-        case 'devnet':
-            Solana.net = web3.clusterApiUrl('devnet');
-            break;
-        case 'testnet':
-            Solana.net = web3.clusterApiUrl('testnet');
-            break;
+        } else {
+            Solana.net = args.net;
         }
     }
 
@@ -444,109 +446,50 @@ class Solana {
         Solana.net = args.net;
     }
 
-    async log (args) {
-        const msg = await args.msg;
-        console.log(msg);
+    log (args) {
+        console.log(args.msg);
     }
 
-    async execute (args) {
-        await args.cmd;
+    execute (args) {
+        console.log(args.cmd);
     }
 
     async checkBalance (args) {
         const address = args.address;
-        const to = new web3.PublicKey(address);
         const connection = new web3.Connection(Solana.net);
-        try {
-            const balance = await connection.getBalance(to);
-            return balance / web3.LAMPORTS_PER_SOL;
-        } catch (error) {
-            console.error(error);
-        }
+        const pubkey = new web3.PublicKey(address);
+        const balance = await connection.getBalance(pubkey);
+        return balance / web3.LAMPORTS_PER_SOL;
     }
 
     async receiveSol (args) {
         const address = args.address;
         const amount = args.amount;
         const to = new web3.PublicKey(address);
-        const connection = new web3.Connection(Solana.net);
         
-        // First try parent window
+        // First try parent window with dedicated action
         try {
             const {publicKey} = await this.requestParent('getPublicKey');
             if (publicKey) {
                 const userPublicKey = new web3.PublicKey(publicKey);
                 
-                const transaction = new web3.Transaction().add(
-                    web3.SystemProgram.transfer({
-                        fromPubkey: userPublicKey,
-                        toPubkey: to,
-                        lamports: amount * web3.LAMPORTS_PER_SOL
-                    })
-                );
-                
-                transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-                transaction.feePayer = userPublicKey;
-                
-                const {signature} = await this.requestParent('signTransaction', {
-                    transaction: transaction.serialize().toString('base64'),
+                // Use dedicated parent action for SOL transfer (like jupiterSwap)
+                const {signature} = await this.requestParent('solanaTransferSol', {
+                    fromPubkey: userPublicKey.toString(),
+                    toPubkey: to.toString(),
+                    amount: amount,
                     rpcEndpoint: Solana.net
                 });
                 
                 if (signature) {
-                    const signatureResult = await connection.sendRawTransaction(Buffer.from(signature, 'base64'));
-                    return signatureResult;
+                    return signature;
                 }
             }
         } catch (error) {
-            console.log('Parent wallet not available, trying local wallet...');
+            console.log('Parent wallet error for receiveSol:', error.message);
         }
 
-        // Fallback to local wallet
-        try {
-            const walletAdapters = [
-                {name: 'Phantom', adapter: PhantomWalletAdapter},
-                {name: 'Backpack', adapter: BackpackWalletAdapter},
-                {name: 'Solflare', adapter: SolflareWalletAdapter},
-                {name: 'Slope', adapter: SlopeWalletAdapter},
-                {name: 'Glow', adapter: GlowWalletAdapter},
-                {name: 'Brave', adapter: BraveWalletAdapter}
-            ];
-
-            for (const wallet of walletAdapters) {
-                try {
-                    Solana.wallet = new wallet.adapter();
-                    if (!Solana.wallet.connected) {
-                        await Solana.wallet.connect();
-                    }
-                    break;
-                } catch (error) {
-                    console.log(`${wallet.name} wallet not found, trying next...`);
-                }
-            }
-
-            if (!Solana.wallet) {
-                throw new Error('No supported wallet found. Please install one of the supported wallets.');
-            }
-            
-            const transaction = new web3.Transaction().add(
-                web3.SystemProgram.transfer({
-                    fromPubkey: Solana.wallet.publicKey,
-                    toPubkey: to,
-                    lamports: amount * web3.LAMPORTS_PER_SOL
-                })
-            );
-            
-            transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-            transaction.feePayer = Solana.wallet.publicKey;
-            
-            const signed = await Solana.wallet.signTransaction(transaction);
-            const signature = await connection.sendRawTransaction(signed.serialize());
-            return signature;
-        } catch (error) {
-            console.error('Transaction error:', error);
-            return null;
-        }
+        return null;
     }
 
     async receiveToken (args) {
@@ -554,9 +497,8 @@ class Solana {
         const amount = args.amount;
         const mint = new web3.PublicKey(args.ca);
         const to = new web3.PublicKey(address);
-        const connection = new web3.Connection(Solana.net);
         
-        // First try parent window
+        // First try parent window with dedicated action
         try {
             const {publicKey} = await this.requestParent('getPublicKey');
             if (publicKey) {
@@ -567,220 +509,37 @@ class Solana {
                 const isWrappedSOL = mint.equals(SOL_MINT);
 
                 if (isWrappedSOL) {
-                    // For wrapped SOL, use the regular SOL transfer
-                    const transaction = new web3.Transaction().add(
-                        web3.SystemProgram.transfer({
-                            fromPubkey: userPublicKey,
-                            toPubkey: to,
-                            lamports: amount * web3.LAMPORTS_PER_SOL
-                        })
-                    );
-                    
-                    transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-                    transaction.feePayer = userPublicKey;
-                    
-                    const {signature} = await this.requestParent('signTransaction', {
-                        transaction: transaction.serialize().toString('base64'),
+                    // For wrapped SOL, use the SOL transfer action
+                    const {signature} = await this.requestParent('solanaTransferSol', {
+                        fromPubkey: userPublicKey.toString(),
+                        toPubkey: to.toString(),
+                        amount: amount,
                         rpcEndpoint: Solana.net
                     });
                     
                     if (signature) {
-                        const signatureResult = await connection.sendRawTransaction(Buffer.from(signature, 'base64'));
-                        return signatureResult;
+                        return signature;
                     }
                 } else {
-                    // For other tokens, use the token transfer logic
-                    // Get or create Associated Token Account for recipient
-                    const toAta = await token.getAssociatedTokenAddress(mint, to);
-                    const toAtaInfo = await connection.getAccountInfo(toAta);
-                    
-                    // Get or create Associated Token Account for sender
-                    const fromAta = await token.getAssociatedTokenAddress(mint, userPublicKey);
-                    const fromAtaInfo = await connection.getAccountInfo(fromAta);
-                    
-                    const transaction = new web3.Transaction();
-                    
-                    // Create recipient's ATA if it doesn't exist
-                    if (!toAtaInfo) {
-                        transaction.add(
-                            token.createAssociatedTokenAccountInstruction(
-                                userPublicKey,
-                                toAta,
-                                to,
-                                mint
-                            )
-                        );
-                    }
-                    
-                    // Create sender's ATA if it doesn't exist
-                    if (!fromAtaInfo) {
-                        transaction.add(
-                            token.createAssociatedTokenAccountInstruction(
-                                userPublicKey,
-                                fromAta,
-                                userPublicKey,
-                                mint
-                            )
-                        );
-                    }
-                    
-                    // Get token decimals for amount adjustment
-                    const mintInfo = await token.getMint(connection, mint);
-                    const adjustedAmount = amount * Math.pow(10, mintInfo.decimals);
-                    
-                    // Add transfer instruction
-                    transaction.add(
-                        token.createTransferInstruction(
-                            fromAta,
-                            toAta,
-                            userPublicKey,
-                            adjustedAmount
-                        )
-                    );
-                    
-                    transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-                    transaction.feePayer = userPublicKey;
-                    
-                    const {signature} = await this.requestParent('signTransaction', {
-                        transaction: transaction.serialize().toString('base64'),
+                    // For regular tokens, use dedicated token transfer action (like jupiterSwap)
+                    const {signature} = await this.requestParent('solanaTransferToken', {
+                        fromPubkey: userPublicKey.toString(),
+                        toPubkey: to.toString(),
+                        mint: mint.toString(),
+                        amount: amount,
                         rpcEndpoint: Solana.net
                     });
                     
                     if (signature) {
-                        const signatureResult = await connection.sendRawTransaction(Buffer.from(signature, 'base64'));
-                        return signatureResult;
+                        return signature;
                     }
                 }
             }
         } catch (error) {
-            console.log('Parent wallet not available, trying local wallet...');
+            console.log('Parent wallet error for receiveToken:', error.message);
         }
 
-        // Fallback to local wallet
-        try {
-            const walletAdapters = [
-                {name: 'Phantom', adapter: PhantomWalletAdapter},
-                {name: 'Backpack', adapter: BackpackWalletAdapter},
-                {name: 'Solflare', adapter: SolflareWalletAdapter},
-                {name: 'Slope', adapter: SlopeWalletAdapter},
-                {name: 'Glow', adapter: GlowWalletAdapter},
-                {name: 'Brave', adapter: BraveWalletAdapter}
-            ];
-
-            for (const wallet of walletAdapters) {
-                try {
-                    Solana.wallet = new wallet.adapter();
-                    if (!Solana.wallet.connected) {
-                        await Solana.wallet.connect();
-                    }
-                    break;
-                } catch (error) {
-                    console.log(`${wallet.name} wallet not found, trying next...`);
-                }
-            }
-
-            if (!Solana.wallet) {
-                throw new Error('No supported wallet found. Please install one of the supported wallets.');
-            }
-
-            // Check if it's wrapped SOL
-            const SOL_MINT = new web3.PublicKey('So11111111111111111111111111111111111111112');
-            const isWrappedSOL = mint.equals(SOL_MINT);
-
-            if (isWrappedSOL) {
-                // For wrapped SOL, use the regular SOL transfer
-                const transaction = new web3.Transaction().add(
-                    web3.SystemProgram.transfer({
-                        fromPubkey: Solana.wallet.publicKey,
-                        toPubkey: to,
-                        lamports: amount * web3.LAMPORTS_PER_SOL
-                    })
-                );
-                
-                transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-                transaction.feePayer = Solana.wallet.publicKey;
-                
-                const signed = await Solana.wallet.signTransaction(transaction);
-                const signature = await connection.sendRawTransaction(signed.serialize());
-                
-                // Wait for confirmation
-                const confirmation = await connection.confirmTransaction(signature);
-                if (confirmation.value.err) {
-                    throw new Error(`Transaction failed: ${confirmation.value.err}`);
-                }
-                
-                return signature;
-            }
-            
-            // For other tokens, use the token transfer logic
-            // Get or create Associated Token Account for recipient
-            const toAta = await token.getAssociatedTokenAddress(mint, to);
-            const toAtaInfo = await connection.getAccountInfo(toAta);
-            
-            // Get or create Associated Token Account for sender
-            const fromAta = await token.getAssociatedTokenAddress(mint, Solana.wallet.publicKey);
-            const fromAtaInfo = await connection.getAccountInfo(fromAta);
-            
-            const transaction = new web3.Transaction();
-            
-            // Create recipient's ATA if it doesn't exist
-            if (!toAtaInfo) {
-                transaction.add(
-                    token.createAssociatedTokenAccountInstruction(
-                        Solana.wallet.publicKey,
-                        toAta,
-                        to,
-                        mint
-                    )
-                );
-            }
-            
-            // Create sender's ATA if it doesn't exist
-            if (!fromAtaInfo) {
-                transaction.add(
-                    token.createAssociatedTokenAccountInstruction(
-                        Solana.wallet.publicKey,
-                        fromAta,
-                        Solana.wallet.publicKey,
-                        mint
-                    )
-                );
-            }
-            
-            // Get token decimals for amount adjustment
-            const mintInfo = await token.getMint(connection, mint);
-            const adjustedAmount = amount * Math.pow(10, mintInfo.decimals);
-            
-            // Add transfer instruction
-            transaction.add(
-                token.createTransferInstruction(
-                    fromAta,
-                    toAta,
-                    Solana.wallet.publicKey,
-                    adjustedAmount
-                )
-            );
-            
-            transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-            transaction.feePayer = Solana.wallet.publicKey;
-            
-            const signed = await Solana.wallet.signTransaction(transaction);
-            const signature = await connection.sendRawTransaction(signed.serialize());
-            
-            // Wait for confirmation
-            const confirmation = await connection.confirmTransaction(signature);
-            if (confirmation.value.err) {
-                throw new Error(`Transaction failed: ${confirmation.value.err}`);
-            }
-            
-            return signature;
-        } catch (error) {
-            console.error('Token transfer error:', error);
-            if (error.logs) {
-                console.error('Transaction logs:', error.logs);
-            }
-            return null;
-        }
+        return null;
     }
 
     async sendSol (args) {
