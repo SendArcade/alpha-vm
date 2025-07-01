@@ -23,7 +23,7 @@ const base = {
         alias: {
             'buffer': require.resolve('buffer'),
             'events': require.resolve('events/'),
-            'node:url': require.resolve('url'),
+            'node:url': require.resolve('url')
         }
     },
     module: {

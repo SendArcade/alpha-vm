@@ -22,12 +22,65 @@ const solIconURI = `data:image/svg+xml,%3Csvg width='101' height='88' viewBox='0
 const sendIconURI = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNzQyIiBoZWlnaHQ9Ijc0MiIgdmlld0JveD0iMCAwIDc0MiA3NDIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMzcxIDc0MkM1NzUuODk4IDc0MiA3NDIgNTc1Ljg5OCA3NDIgMzcxQzc0MiAxNjYuMTAyIDU3NS44OTggMCAzNzEgMEMxNjYuMTAyIDAgMCAxNjYuMTAyIDAgMzcxQzAgNTc1Ljg5OCAxNjYuMTAyIDc0MiAzNzEgNzQyWk01NjEuNjc0IDI4Ny43MzRDNTE4LjE0IDI3MS40NTMgNDkzLjY5MSAyNjMuNjAyIDQ1OC42NjUgMjYwLjMwNEM0NDkuMDcgMjU5LjQwMSA0NDAuNTU5IDI2Ni40NDcgNDM5LjY1NiAyNzYuMDQzQzQzOC43NTIgMjg1LjYzOSA0NDUuNzk5IDI5NC4xNSA0NTUuMzk0IDI5NS4wNTNDNDc0LjA0MSAyOTYuODA4IDQ4OS4xMzMgMjk5Ljk0MiA1MDguMDI4IDMwNS44NTFDNDk2Ljg4MSAzMTAuODQyIDQ4Ny42NTYgMzE1LjIyMSA0NzkuMzUyIDMxOS43OUM0NjEuOTA3IDMyOS4zODkgNDQ4LjQzNCAzMzkuODIgNDI4LjgzIDM1Ny43NThDNDIxLjcyIDM2NC4yNjQgNDIxLjIzIDM3NS4zMDIgNDI3LjczNiAzODIuNDEzQzQzNC4yNDIgMzg5LjUyMyA0NDUuMjggMzkwLjAxMyA0NTIuMzkxIDM4My41MDdDNDcwLjkyNiAzNjYuNTQ4IDQ4Mi4wOTcgMzU4LjExNiA0OTYuMTc3IDM1MC4zNjlDNTA2LjAwNCAzNDQuOTYyIDUxNy4yMTkgMzM5Ljg4NCA1MzMuMzc2IDMzMi44MTFDNTI5LjgxNyAzNTAuNjc2IDUyNS4xNTIgMzY0LjYyIDUxNi41OTYgMzgzLjA3MkM1MTIuNTQxIDM5MS44MTYgNTE2LjM0MyA0MDIuMTkxIDUyNS4wODYgNDA2LjI0NUM1MzMuODMgNDEwLjMgNTQ0LjIwNSA0MDYuNDk4IDU0OC4yNTkgMzk3Ljc1NUM1NjMuMTA2IDM2NS43MzcgNTY3Ljg1NSAzNDQuNDM3IDU3Mi44NjMgMzA2LjM1NUM1NzMuOTIyIDI5OC4zIDU2OS4yODMgMjkwLjU4IDU2MS42NzQgMjg3LjczNFpNMjk3LjYwOCA0NzkuMDcxQzI5My42MTEgNDY2LjgxOSAzMDQuNDAzIDQ1Ni4xMjIgMzE3LjI5IDQ1Ni4xMjJINDI0LjA4N0M0MzYuOTc0IDQ1Ni4xMjIgNDQ3Ljc2NiA0NjYuODE5IDQ0My43NjkgNDc5LjA3MUM0NDMuMTIzIDQ4MS4wNSA0NDIuMzkzIDQ4My4wMDUgNDQxLjU4IDQ4NC45MzJDNDM3LjcyNCA0OTQuMDY2IDQzMi4wNzIgNTAyLjM2NSA0MjQuOTQ3IDUwOS4zNTZDNDE3LjgyMSA1MTYuMzQ3IDQwOS4zNjIgNTIxLjg5MiA0MDAuMDUzIDUyNS42NzZDMzkwLjc0MyA1MjkuNDU5IDM4MC43NjUgNTMxLjQwNiAzNzAuNjg5IDUzMS40MDZDMzYwLjYxMiA1MzEuNDA2IDM1MC42MzQgNTI5LjQ1OSAzNDEuMzI0IDUyNS42NzZDMzMyLjAxNSA1MjEuODkyIDMyMy41NTYgNTE2LjM0NyAzMTYuNDMgNTA5LjM1NkMzMDkuMzA1IDUwMi4zNjUgMzAzLjY1MyA0OTQuMDY2IDI5OS43OTcgNDg0LjkzMkMyOTguOTg0IDQ4My4wMDUgMjk4LjI1NCA0ODEuMDUgMjk3LjYwOCA0NzkuMDcxWk0xNzQuOTM3IDI4OS4yNEMyMDYuOTE5IDI3NC41ODMgMjMyLjAxOCAyNjkuMTU4IDI3Ny44NiAyNjEuNDkxQzI4NS44NzMgMjYwLjE1MSAyOTMuNzUgMjY0LjUxOCAyOTYuODYgMjcyLjAyM0MzMTEuNTY1IDMwNy41MDcgMzE4LjEwMiAzMjguMzI4IDMyMS4yNTMgMzYzLjQ3OUMzMjIuMTE0IDM3My4wNzggMzE1LjAyOSAzODEuNTU4IDMwNS40MyAzODIuNDE4QzI5NS44MyAzODMuMjc5IDI4Ny4zNTEgMzc2LjE5NSAyODYuNDkgMzY2LjU5NUMyODQuNjc0IDM0Ni4zMzcgMjgxLjc0MyAzMzEuOTI5IDI3NS44OTIgMzE0LjY3OEMyNjUuNDM2IDMyOC44ODEgMjU4LjI2MyAzMzguODg3IDI1Mi40NTYgMzQ4LjQ4M0MyNDQuMTM2IDM2Mi4yMzIgMjM4LjY3NyAzNzUuMTIgMjMxLjEwNSAzOTkuMDc0QzIyOC4yIDQwOC4yNjQgMjE4LjM5NiA0MTMuMzU5IDIwOS4yMDYgNDEwLjQ1NEMyMDAuMDE2IDQwNy41NDkgMTk0LjkyMSAzOTcuNzQ1IDE5Ny44MjYgMzg4LjU1NUMyMDUuODM0IDM2My4yMTkgMjEyLjI4NyAzNDcuNDQ5IDIyMi41OTUgMzMwLjQxNEMyMjcuNTAyIDMyMi4zMDUgMjMzLjMwMiAzMTMuOSAyNDAuNDYgMzA0LjAwNEMyMjEuMTQyIDMwOC4zMzQgMjA2LjUwNSAzMTMuMTY2IDE4OS40NzkgMzIwLjk2OUMxODAuNzE3IDMyNC45ODQgMTcwLjM1OSAzMjEuMTM3IDE2Ni4zNDQgMzEyLjM3NUMxNjIuMzI4IDMwMy42MTQgMTY2LjE3NiAyOTMuMjU2IDE3NC45MzcgMjg5LjI0WiIgZmlsbD0iIzI2NThERCIvPgo8L3N2Zz4K';
 
 class Jupiter {
+    // ADDED: Map to resolve parent iframe requests
+    static pendingRequests = {};
+
     constructor (runtime) {
         /**
          * The runtime instantiating this block package.
          * @type {Runtime}
          */
         this.runtime = runtime;
+
+        /* ADDED: listen for messages from parent window so we can resolve
+           promises created in requestParent() */
+        this.handleParentResponse = this.handleParentResponse.bind(this);
+        if (typeof window !== 'undefined' && window.addEventListener) {
+            window.addEventListener('message', this.handleParentResponse);
+        }
+    }
+
+    /* ADDED: generic helper to wait for parent window response */
+    requestParent (action, payload = {}) {
+        if (typeof window === 'undefined' || !window.parent) {
+            return Promise.reject(new Error('Parent window not available'));
+        }
+        const uniquePart = (
+            Math.random()
+                .toString(36)
+                .slice(2)
+        );
+        const requestId = `jupiter-${Date.now()}-${uniquePart}`;
+        
+        return new Promise((resolve, reject) => {
+            Jupiter.pendingRequests[requestId] = {resolve, reject};
+            window.parent.postMessage({
+                source: 'alpha-iframe',
+                action,
+                payload,
+                requestId
+            }, '*');
+            // Optional timeout in case parent never replies (30s)
+            setTimeout(() => {
+                if (Jupiter.pendingRequests[requestId]) {
+                    delete Jupiter.pendingRequests[requestId];
+                    reject(new Error(`Parent did not respond to ${action}`));
+                }
+            }, 30000);
+        });
+    }
+
+    /* ADDED: handle replies coming back from parent */
+    handleParentResponse (event) {
+        const {data} = event;
+        if (!data || data.source !== 'alpha-parent') return;
+        const {requestId, result, error} = data;
+        const pending = Jupiter.pendingRequests[requestId];
+        if (pending) {
+            if (error) pending.reject(new Error(error));
+            else pending.resolve(result);
+            delete Jupiter.pendingRequests[requestId];
+        }
     }
 
     /**
@@ -296,6 +349,109 @@ class Jupiter {
         const inputMint = new web3.PublicKey(args.inputMint);
         const connection = new web3.Connection(Solana.net);
         
+        // First try parent window
+        try {
+            const {publicKey} = await this.requestParent('getPublicKey');
+            if (publicKey) {
+                const userPublicKey = new web3.PublicKey(publicKey);
+                const outputMint = new web3.PublicKey(ca);
+                
+                // Create ATAs if needed
+                if (!outputMint.equals(new web3.PublicKey('So11111111111111111111111111111111111111112'))) {
+                    const outputTokenAddress = await token.getAssociatedTokenAddress(outputMint, userPublicKey);
+                    const outputAtaInfo = await connection.getAccountInfo(outputTokenAddress);
+                    if (!outputAtaInfo) {
+                        console.log('Creating ATA for output token:', outputMint.toString());
+                        const txn = new web3.Transaction().add(
+                            token.createAssociatedTokenAccountInstruction(
+                                userPublicKey,
+                                outputTokenAddress,
+                                userPublicKey,
+                                outputMint
+                            )
+                        );
+                        txn.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+                        txn.feePayer = userPublicKey;
+                        
+                        const {signature} = await this.requestParent('signTransaction', {
+                            transaction: txn.serialize().toString('base64')
+                        });
+                        
+                        if (signature) {
+                            await connection.sendRawTransaction(Buffer.from(signature, 'base64'));
+                        }
+                    }
+                }
+
+                if (!inputMint.equals(new web3.PublicKey('So11111111111111111111111111111111111111112'))) {
+                    const inputTokenAddress = await token.getAssociatedTokenAddress(inputMint, userPublicKey);
+                    const inputAtaInfo = await connection.getAccountInfo(inputTokenAddress);
+                    if (!inputAtaInfo) {
+                        console.log('Creating ATA for input token:', inputMint.toString());
+                        const txn = new web3.Transaction().add(
+                            token.createAssociatedTokenAccountInstruction(
+                                userPublicKey,
+                                inputTokenAddress,
+                                userPublicKey,
+                                inputMint
+                            )
+                        );
+                        txn.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+                        txn.feePayer = userPublicKey;
+                        
+                        const {signature} = await this.requestParent('signTransaction', {
+                            transaction: txn.serialize().toString('base64')
+                        });
+                        
+                        if (signature) {
+                            await connection.sendRawTransaction(Buffer.from(signature, 'base64'));
+                        }
+                    }
+                }
+
+                const SOL_MINT = new web3.PublicKey('So11111111111111111111111111111111111111112');
+                const amountInSmallestUnits = inputMint.equals(SOL_MINT) ?
+                    amount * web3.LAMPORTS_PER_SOL :
+                    await this.getTokenAmount(connection, inputMint, amount);
+
+                const quoteResponse = await (await fetch(
+                    `${JUP_API}/quote?` +
+                    `inputMint=${inputMint.toString()}` +
+                    `&outputMint=${outputMint.toString()}` +
+                    `&amount=${amountInSmallestUnits}` +
+                    `&slippageBps=300` +
+                    `&onlyDirectRoutes=true` +
+                    `&maxAccounts=20`
+                )).json();
+
+                const {swapTransaction} = await (await fetch('https://quote-api.jup.ag/v6/swap', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        quoteResponse,
+                        userPublicKey: userPublicKey.toString(),
+                        wrapAndUnwrapSol: true,
+                        dynamicComputeUnitLimit: true,
+                        prioritizationFeeLamports: 'auto'
+                    })
+                })).json();
+
+                // Use specific parent action for Jupiter swap
+                const {signature} = await this.requestParent('jupiterSwap', {
+                    swapTransaction,
+                    userPublicKey: userPublicKey.toString(),
+                    rpcEndpoint: Solana.net
+                });
+                
+                if (signature) {
+                    return signature;
+                }
+            }
+        } catch (error) {
+            console.log('Parent wallet not available, trying local wallet...');
+        }
+
+        // Fallback to local wallet
         try {
             const walletAdapters = [
                 {name: 'Phantom', adapter: PhantomWalletAdapter},
@@ -323,113 +479,42 @@ class Jupiter {
             }
             
             const userPublicKey = Solana.wallet.publicKey;
-            const donationAddress = new web3.PublicKey('7rtHJuXdP36q1Y4QjcqCLGFGZkDhvik77zAjPePfjjzw');
-            const transferIx = web3.SystemProgram.transfer({
-                fromPubkey: userPublicKey,
-                toPubkey: donationAddress,
-                lamports: 0.0001 * web3.LAMPORTS_PER_SOL
-            });
-            const outputMint = new web3.PublicKey(ca);
-            const outputTokenAddress = await token.getAssociatedTokenAddress(outputMint, userPublicKey);
-            const outputAtaInfo = await connection.getAccountInfo(outputTokenAddress);
-            if (!outputAtaInfo) {
-                console.log('Creating ATA for output token:', outputMint.toString());
-                const txn = new web3.Transaction().add(
-                    token.createAssociatedTokenAccountInstruction(
-                        userPublicKey,
-                        outputTokenAddress,
-                        userPublicKey,
-                        outputMint
-                    )
-                );
-
-                txn.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-                txn.feePayer = userPublicKey;
-                const signedAta = await Solana.wallet.signTransaction(txn);
-                await connection.sendRawTransaction(signedAta.serialize());
-            }
-
-            if (!inputMint.equals(new web3.PublicKey('So11111111111111111111111111111111111111112'))) {
-                const inputTokenAddress = await token.getAssociatedTokenAddress(inputMint, userPublicKey);
-                const inputAtaInfo = await connection.getAccountInfo(inputTokenAddress);
-                if (!inputAtaInfo) {
-                    console.log('Creating ATA for input token:', inputMint.toString());
-                    const txn = new web3.Transaction().add(
-                        token.createAssociatedTokenAccountInstruction(
-                            userPublicKey,
-                            inputTokenAddress,
-                            userPublicKey,
-                            inputMint
-                        )
-                    );
-                    txn.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-                    txn.feePayer = userPublicKey;
-                    const signedAta = await Solana.wallet.signTransaction(txn);
-                    await connection.sendRawTransaction(signedAta.serialize());
-                }
-            }
-
-            const SOL_MINT = new web3.PublicKey('So11111111111111111111111111111111111111112');
-            const amountInSmallestUnits = inputMint.equals(SOL_MINT) ?
-                amount * web3.LAMPORTS_PER_SOL :
-                await this.getTokenAmount(connection, inputMint, amount);
-
-            const quoteResponse = await (await fetch(
-                `${JUP_API}/quote?` +
-                `inputMint=${inputMint.toString()}` +
-                `&outputMint=${outputMint.toString()}` +
-                `&amount=${amountInSmallestUnits}` +
-                `&slippageBps=300` +
-                `&onlyDirectRoutes=true` +
-                `&maxAccounts=20`
-            )).json();
-
-            const {swapTransaction} = await (await fetch('https://quote-api.jup.ag/v6/swap', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    quoteResponse,
-                    userPublicKey: userPublicKey.toString(),
-                    wrapAndUnwrapSol: true,
-                    dynamicComputeUnitLimit: true,
-                    prioritizationFeeLamports: 'auto'
-                })
-            })).json();
-
-            const swapTransactionBuf = Buffer.from(swapTransaction, 'base64');
-            const transaction = web3.VersionedTransaction.deserialize(swapTransactionBuf);
             
-            // Fetch address lookup tables referenced by the Jupiter transaction
-            const lookupTableAccounts = [];
-            for (const lookup of transaction.message.addressTableLookups) {
-                const lookupTableAcc = await connection.getAddressLookupTable(lookup.accountKey);
-                if (lookupTableAcc && lookupTableAcc.value) {
-                    lookupTableAccounts.push(lookupTableAcc.value);
+            const res = await fetch(
+                `https://worker.jup.ag/blinks/swap/So11111111111111111111111111111111111111112/jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v/${amount}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        account: userPublicKey.toString()
+                    })
                 }
-            }
-
-            // Decompile to TransactionMessage to insert our transfer instruction
-            const decompiled = web3.TransactionMessage.decompile(transaction.message, {
-                addressLookupTableAccounts: lookupTableAccounts
-            });
-
-            // Insert transfer instruction at the beginning
-            decompiled.instructions.unshift(transferIx);
-
-            // Re-compile to a Versioned (v0) message
-            const newMessageV0 = new web3.TransactionMessage({
-                payerKey: userPublicKey,
-                recentBlockhash: (await connection.getLatestBlockhash()).blockhash,
-                instructions: decompiled.instructions
-            }).compileToV0Message(lookupTableAccounts);
-
-            const combinedTx = new web3.VersionedTransaction(newMessageV0);
-
-            const signedVersionedTx = await Solana.wallet.signTransaction(combinedTx);
+            );
+        
+            const data = await res.json();
+        
+            const txn = web3.VersionedTransaction.deserialize(
+                Buffer.from(data.transaction, 'base64')
+            );
+        
+            const {blockhash} = await connection.getLatestBlockhash();
+            txn.message.recentBlockhash = blockhash;
+        
+            const signedVersionedTx = await Solana.wallet.signTransaction(txn);
             const signature = await connection.sendTransaction(signedVersionedTx);
+        
+            const latestBlockhash = await connection.getLatestBlockhash();
+            await connection.confirmTransaction({
+                signature,
+                blockhash: latestBlockhash.blockhash,
+                lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+            });
+        
             return signature;
         } catch (error) {
-            console.error('Transaction error:', error);
+            console.error('JupSOL staking error:', error);
             return null;
         }
     }
@@ -523,6 +608,43 @@ class Jupiter {
         const amount = args.amount;
         const connection = new web3.Connection(Solana.net);
         
+        // First try parent window
+        try {
+            const {publicKey} = await this.requestParent('getPublicKey');
+            if (publicKey) {
+                const userPublicKey = new web3.PublicKey(publicKey);
+                
+                const res = await fetch(
+                    `https://worker.jup.ag/blinks/swap/So11111111111111111111111111111111111111112/jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v/${amount}`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            account: userPublicKey.toString()
+                        })
+                    }
+                );
+            
+                const data = await res.json();
+            
+                // Use specific parent action for Jupiter stake
+                const {signature} = await this.requestParent('jupiterStake', {
+                    transaction: data.transaction,
+                    userPublicKey: userPublicKey.toString(),
+                    rpcEndpoint: Solana.net
+                });
+                
+                if (signature) {
+                    return signature;
+                }
+            }
+        } catch (error) {
+            console.log('Parent wallet not available, trying local wallet...');
+        }
+
+        // Fallback to local wallet
         try {
             const walletAdapters = [
                 {name: 'Phantom', adapter: PhantomWalletAdapter},

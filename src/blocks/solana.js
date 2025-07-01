@@ -3,7 +3,7 @@ const BlockType = require('../extension-support/block-type');
 const ArgumentType = require('../extension-support/argument-type');
 const web3 = require('@solana/web3.js');
 const bs58 = require('bs58');
-// const {Buffer} = require('buffer');
+const {Buffer} = require('buffer');
 const token = require('@solana/spl-token');
 // const JUP_API = 'https://quote-api.jup.ag/v6';
 
@@ -25,6 +25,9 @@ class Solana {
     static net = 'https://flying-torrie-fast-mainnet.helius-rpc.com';
     static wallet = null;
     
+    // ADDED: Map to resolve parent iframe requests
+    static pendingRequests = {};
+
     constructor (runtime) {
         /**
          * The runtime instantiating this block package.
@@ -55,6 +58,56 @@ class Solana {
             if (!Solana.wallet) {
                 console.error('No supported wallet found. Please install one of the supported wallets.');
             }
+        }
+
+        /* ADDED: listen for messages from parent window so we can resolve
+           promises created in requestParent() */
+        this.handleParentResponse = this.handleParentResponse.bind(this);
+        if (typeof window !== 'undefined' && window.addEventListener) {
+            window.addEventListener('message', this.handleParentResponse);
+        }
+    }
+
+    /* ADDED: generic helper to wait for parent window response */
+    requestParent (action, payload = {}) {
+        if (typeof window === 'undefined' || !window.parent) {
+            return Promise.reject(new Error('Parent window not available'));
+        }
+        const uniquePart = (
+            Math.random()
+                .toString(36)
+                .slice(2)
+        );
+        const requestId = `solana-${Date.now()}-${uniquePart}`;
+        
+        return new Promise((resolve, reject) => {
+            Solana.pendingRequests[requestId] = {resolve, reject};
+            window.parent.postMessage({
+                source: 'alpha-iframe',
+                action,
+                payload,
+                requestId
+            }, '*');
+            // Optional timeout in case parent never replies (30s)
+            setTimeout(() => {
+                if (Solana.pendingRequests[requestId]) {
+                    delete Solana.pendingRequests[requestId];
+                    reject(new Error(`Parent did not respond to ${action}`));
+                }
+            }, 30000);
+        });
+    }
+
+    /* ADDED: handle replies coming back from parent */
+    handleParentResponse (event) {
+        const {data} = event;
+        if (!data || data.source !== 'alpha-parent') return;
+        const {requestId, result, error} = data;
+        const pending = Solana.pendingRequests[requestId];
+        if (pending) {
+            if (error) pending.reject(new Error(error));
+            else pending.resolve(result);
+            delete Solana.pendingRequests[requestId];
         }
     }
 
@@ -346,14 +399,30 @@ class Solana {
 
     async getUserPublicKey () {
         try {
-            if (!Solana.wallet.connected) {
-                await Solana.wallet.connect();
+            // First try parent window
+            const {publicKey} = await this.requestParent('getPublicKey');
+            if (publicKey) {
+                return publicKey;
             }
-            return Solana.wallet.publicKey.toString();
         } catch (error) {
-            console.error('Error connecting wallet:', error);
-            return null;
+            console.log('Parent wallet not available, trying local wallet...');
         }
+
+        // Fallback to local wallet
+        try {
+            if (Solana.wallet) {
+                if (!Solana.wallet.connected) {
+                    await Solana.wallet.connect();
+                }
+                if (Solana.wallet.connected) {
+                    return Solana.wallet.publicKey.toString();
+                }
+            }
+        } catch (error) {
+            console.error('Error getting public key:', error);
+        }
+        
+        return null;
     }
 
     setNet (args) {
@@ -402,6 +471,38 @@ class Solana {
         const to = new web3.PublicKey(address);
         const connection = new web3.Connection(Solana.net);
         
+        // First try parent window
+        try {
+            const {publicKey} = await this.requestParent('getPublicKey');
+            if (publicKey) {
+                const userPublicKey = new web3.PublicKey(publicKey);
+                
+                const transaction = new web3.Transaction().add(
+                    web3.SystemProgram.transfer({
+                        fromPubkey: userPublicKey,
+                        toPubkey: to,
+                        lamports: amount * web3.LAMPORTS_PER_SOL
+                    })
+                );
+                
+                transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+                transaction.feePayer = userPublicKey;
+                
+                const {signature} = await this.requestParent('signTransaction', {
+                    transaction: transaction.serialize().toString('base64'),
+                    rpcEndpoint: Solana.net
+                });
+                
+                if (signature) {
+                    const signatureResult = await connection.sendRawTransaction(Buffer.from(signature, 'base64'));
+                    return signatureResult;
+                }
+            }
+        } catch (error) {
+            console.log('Parent wallet not available, trying local wallet...');
+        }
+
+        // Fallback to local wallet
         try {
             const walletAdapters = [
                 {name: 'Phantom', adapter: PhantomWalletAdapter},
@@ -455,6 +556,107 @@ class Solana {
         const to = new web3.PublicKey(address);
         const connection = new web3.Connection(Solana.net);
         
+        // First try parent window
+        try {
+            const {publicKey} = await this.requestParent('getPublicKey');
+            if (publicKey) {
+                const userPublicKey = new web3.PublicKey(publicKey);
+                
+                // Check if it's wrapped SOL
+                const SOL_MINT = new web3.PublicKey('So11111111111111111111111111111111111111112');
+                const isWrappedSOL = mint.equals(SOL_MINT);
+
+                if (isWrappedSOL) {
+                    // For wrapped SOL, use the regular SOL transfer
+                    const transaction = new web3.Transaction().add(
+                        web3.SystemProgram.transfer({
+                            fromPubkey: userPublicKey,
+                            toPubkey: to,
+                            lamports: amount * web3.LAMPORTS_PER_SOL
+                        })
+                    );
+                    
+                    transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+                    transaction.feePayer = userPublicKey;
+                    
+                    const {signature} = await this.requestParent('signTransaction', {
+                        transaction: transaction.serialize().toString('base64'),
+                        rpcEndpoint: Solana.net
+                    });
+                    
+                    if (signature) {
+                        const signatureResult = await connection.sendRawTransaction(Buffer.from(signature, 'base64'));
+                        return signatureResult;
+                    }
+                } else {
+                    // For other tokens, use the token transfer logic
+                    // Get or create Associated Token Account for recipient
+                    const toAta = await token.getAssociatedTokenAddress(mint, to);
+                    const toAtaInfo = await connection.getAccountInfo(toAta);
+                    
+                    // Get or create Associated Token Account for sender
+                    const fromAta = await token.getAssociatedTokenAddress(mint, userPublicKey);
+                    const fromAtaInfo = await connection.getAccountInfo(fromAta);
+                    
+                    const transaction = new web3.Transaction();
+                    
+                    // Create recipient's ATA if it doesn't exist
+                    if (!toAtaInfo) {
+                        transaction.add(
+                            token.createAssociatedTokenAccountInstruction(
+                                userPublicKey,
+                                toAta,
+                                to,
+                                mint
+                            )
+                        );
+                    }
+                    
+                    // Create sender's ATA if it doesn't exist
+                    if (!fromAtaInfo) {
+                        transaction.add(
+                            token.createAssociatedTokenAccountInstruction(
+                                userPublicKey,
+                                fromAta,
+                                userPublicKey,
+                                mint
+                            )
+                        );
+                    }
+                    
+                    // Get token decimals for amount adjustment
+                    const mintInfo = await token.getMint(connection, mint);
+                    const adjustedAmount = amount * Math.pow(10, mintInfo.decimals);
+                    
+                    // Add transfer instruction
+                    transaction.add(
+                        token.createTransferInstruction(
+                            fromAta,
+                            toAta,
+                            userPublicKey,
+                            adjustedAmount
+                        )
+                    );
+                    
+                    transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+                    transaction.feePayer = userPublicKey;
+                    
+                    const {signature} = await this.requestParent('signTransaction', {
+                        transaction: transaction.serialize().toString('base64'),
+                        rpcEndpoint: Solana.net
+                    });
+                    
+                    if (signature) {
+                        const signatureResult = await connection.sendRawTransaction(Buffer.from(signature, 'base64'));
+                        return signatureResult;
+                    }
+                }
+            }
+        } catch (error) {
+            console.log('Parent wallet not available, trying local wallet...');
+        }
+
+        // Fallback to local wallet
         try {
             const walletAdapters = [
                 {name: 'Phantom', adapter: PhantomWalletAdapter},
