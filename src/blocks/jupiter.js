@@ -134,34 +134,6 @@ class Jupiter {
                     }
                 },
 
-                // {
-                //     opcode: 'swapToken',
-                //     blockType: BlockType.REPORTER,
-                //     text: '[JUPITER] Swap [amount] [inputMint] for CA:[ca] by [privateKey]',
-                //     arguments: {
-                //         privateKey: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: 'Private Key'
-                //         },
-                //         amount: {
-                //             type: ArgumentType.NUMBER,
-                //             defaultValue: 1
-                //         },
-                //         inputMint: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: 'Input Mint'
-                //         },
-                //         ca: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: 'Contract Address'
-                //         },
-                //         JUPITER: {
-                //             type: ArgumentType.IMAGE,
-                //             dataURI: JupIconURI
-                //         }
-                //     }
-                // },
-
                 {
                     opcode: 'swapTokenByUser',
                     blockType: BlockType.REPORTER,
@@ -186,26 +158,6 @@ class Jupiter {
                     }
                 },
 
-                // {
-                //     opcode: 'stake',
-                //     blockType: BlockType.REPORTER,
-                //     text: '[JUPITER] Stake [amount] Sol for JupSol by [privateKey]',
-                //     arguments: {
-                //         amount: {
-                //             type: ArgumentType.NUMBER,
-                //             defaultValue: 1
-                //         },
-                //         privateKey: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: 'Private Key'
-                //         },
-                //         JUPITER: {
-                //             type: ArgumentType.IMAGE,
-                //             dataURI: JupIconURI
-                //         }
-                //     }
-                // },
-
                 {
                     opcode: 'stakeByUser',
                     blockType: BlockType.REPORTER,
@@ -214,6 +166,55 @@ class Jupiter {
                         amount: {
                             type: ArgumentType.NUMBER,
                             defaultValue: 1
+                        },
+                        JUPITER: {
+                            type: ArgumentType.IMAGE,
+                            dataURI: JupIconURI
+                        }
+                    }
+                },
+
+                {
+                    opcode: 'swapToken',
+                    blockType: BlockType.REPORTER,
+                    text: '[JUPITER] Swap [amount] [inputMint] for CA:[ca] by [privateKey]',
+                    arguments: {
+                        privateKey: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'Private Key'
+                        },
+                        amount: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 1
+                        },
+                        inputMint: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'Input Mint'
+                        },
+                        ca: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'Contract Address'
+                        },
+                        JUPITER: {
+                            type: ArgumentType.IMAGE,
+                            dataURI: JupIconURI
+                        }
+                    }
+                },
+
+          
+                {
+                    opcode: 'stake',
+                    blockType: BlockType.REPORTER,
+                    text: '[JUPITER] Stake [amount] Sol for JupSol by [privateKey]',
+                    arguments: {
+                        amount: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 1
+                        },
+                        privateKey: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'Private Key'
                         },
                         JUPITER: {
                             type: ArgumentType.IMAGE,

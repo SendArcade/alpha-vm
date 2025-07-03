@@ -257,78 +257,6 @@ class Solana {
                     }
                 },
 
-                // {
-                //     opcode: 'sendSol',
-                //     blockType: BlockType.REPORTER,
-                //     text: '[SOLANA] Send [amount] Sol from [private] to [address]',
-                //     arguments: {
-                //         private: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: 'PrivateKey'
-                //         },
-                //         address: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: 'PubKey'
-                //         },
-                //         amount: {
-                //             type: ArgumentType.NUMBER,
-                //             defaultValue: 1
-                //         },
-                //         SOLANA: {
-                //             type: ArgumentType.IMAGE,
-                //             dataURI: blockIconURI
-                //         }
-                //     }
-                // },
-
-                // {
-                //     opcode: 'sendToken',
-                //     blockType: BlockType.REPORTER,
-                //     text: '[SOLANA] Send [amount] of mint [ca] from [private] to [address]',
-                //     arguments: {
-                //         ca: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: 'Contract Address'
-                //         },
-                //         private: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: 'PrivateKey'
-                //         },
-                //         address: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: 'PubKey'
-                //         },
-                //         amount: {
-                //             type: ArgumentType.NUMBER,
-                //             defaultValue: 1
-                //         },
-                //         SOLANA: {
-                //             type: ArgumentType.IMAGE,
-                //             dataURI: blockIconURI
-                //         }
-                //     }
-                // },
-
-                // {
-                //     opcode: 'deployToken',
-                //     blockType: BlockType.REPORTER,
-                //     text: '[SOLANA] Deploy token by [privateKey] with Decimals:[decimals]',
-                //     arguments: {
-                //         privateKey: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: 'Private Key'
-                //         },
-                //         decimals: {
-                //             type: ArgumentType.NUMBER,
-                //             defaultValue: 9
-                //         },
-                //         SOLANA: {
-                //             type: ArgumentType.IMAGE,
-                //             dataURI: blockIconURI
-                //         }
-                //     }
-                // },
-
                 {
                     opcode: 'requestFunds',
                     blockType: BlockType.REPORTER,
@@ -367,13 +295,73 @@ class Solana {
                             dataURI: blockIconURI
                         }
                     }
-                }
+                },
+
+                {
+                    opcode: 'sendSol',
+                    blockType: BlockType.REPORTER,
+                    text: '[SOLANA] Send [amount] Sol from [private] to [address]',
+                    arguments: {
+                        private: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'PrivateKey'
+                        },
+                        address: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'PubKey'
+                        },
+                        amount: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 1
+                        },
+                        SOLANA: {
+                            type: ArgumentType.IMAGE,
+                            dataURI: blockIconURI
+                        }
+                    }
+                },
+
+                {
+                    opcode: 'sendToken',
+                    blockType: BlockType.REPORTER,
+                    text: '[SOLANA] Send [amount] of mint [ca] from [private] to [address]',
+                    arguments: {
+                        ca: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'Contract Address'
+                        },
+                        private: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'PrivateKey'
+                        },
+                        address: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'PubKey'
+                        },
+                        amount: {
+                            type: ArgumentType.NUMBER,
+                            defaultValue: 1
+                        },
+                        SOLANA: {
+                            type: ArgumentType.IMAGE,
+                            dataURI: blockIconURI
+                        }
+                    }
+                },
 
                 // {
-                //     opcode: 'newWallet',
+                //     opcode: 'deployToken',
                 //     blockType: BlockType.REPORTER,
-                //     text: '[SOLANA] Create new wallet',
+                //     text: '[SOLANA] Deploy token by [privateKey] with Decimals:[decimals]',
                 //     arguments: {
+                //         privateKey: {
+                //             type: ArgumentType.STRING,
+                //             defaultValue: 'Private Key'
+                //         },
+                //         decimals: {
+                //             type: ArgumentType.NUMBER,
+                //             defaultValue: 9
+                //         },
                 //         SOLANA: {
                 //             type: ArgumentType.IMAGE,
                 //             dataURI: blockIconURI
@@ -381,21 +369,33 @@ class Solana {
                 //     }
                 // },
 
-                // {
-                //     opcode: 'getPublicKey',
-                //     blockType: BlockType.REPORTER,
-                //     text: '[SOLANA] Get Public Key of [privateKey]',
-                //     arguments: {
-                //         privateKey: {
-                //             type: ArgumentType.STRING,
-                //             defaultValue: 'Private Key'
-                //         },
-                //         SOLANA: {
-                //             type: ArgumentType.IMAGE,
-                //             dataURI: blockIconURI
-                //         }
-                //     }
-                // }
+                {
+                    opcode: 'newWallet',
+                    blockType: BlockType.REPORTER,
+                    text: '[SOLANA] Create new wallet',
+                    arguments: {
+                        SOLANA: {
+                            type: ArgumentType.IMAGE,
+                            dataURI: blockIconURI
+                        }
+                    }
+                },
+
+                {
+                    opcode: 'getPublicKey',
+                    blockType: BlockType.REPORTER,
+                    text: '[SOLANA] Get Public Key of [privateKey]',
+                    arguments: {
+                        privateKey: {
+                            type: ArgumentType.STRING,
+                            defaultValue: 'Private Key'
+                        },
+                        SOLANA: {
+                            type: ArgumentType.IMAGE,
+                            dataURI: blockIconURI
+                        }
+                    }
+                }
 
             ],
             menus: {
